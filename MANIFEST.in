@@ -1,0 +1,6 @@
+include LICENSE
+include MANIFEST.in
+include AUTHORS.md CHANGELOG.md CODE_OF_CONDUCT.md README.md
+
+graft ggmolvis
+global-exclude *.py[cod] __pycache__ *.so
