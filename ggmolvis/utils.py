@@ -1,5 +1,8 @@
 import numpy as np
 
+import bpy
+import mathutils
+
 def convert_list_to_array(value):
     if isinstance(value, np.ndarray):
         # Check if it's a 1D array with size 3, convert to 2D array with shape (1, 3)
@@ -22,3 +25,58 @@ def convert_list_to_array(value):
             raise ValueError("List of coordinates must have shape (N, 3)")
 
     raise ValueError("Coordinates must be a NumPy array or a list of tuples/lists with shape (N, 3)")
+
+def look_at(camera_position, target_position):
+    # https://blender.stackexchange.com/questions/68834/recreate-to-track-quat-with-two-vectors-using-python
+    camera_direction = camera_position - target_position
+    camera_direction = camera_direction / np.linalg.norm(camera_direction)
+    camera_right = np.cross(np.array([0.0, 0.0, 1.0]), camera_direction)
+    camera_right = camera_right / np.linalg.norm(camera_right)
+    camera_up = np.cross(camera_direction, camera_right)
+    camera_up = camera_up / np.linalg.norm(camera_up)
+    rotation_transform = np.zeros((4, 4))
+    rotation_transform[0, :3] = camera_right
+    rotation_transform[1, :3] = camera_up
+    rotation_transform[2, :3] = camera_direction
+    rotation_transform[-1, -1] = 1
+    translation_transform = np.eye(4)
+    translation_transform[:3, -1] = - camera_position
+    look_at_transform = np.matmul(rotation_transform, translation_transform)
+    return look_at_transform
+
+def quaternion_to_euler(quaternion):
+    """
+    Convert quaternion to Euler angles.
+
+    Parameters:
+    quaternion (mathutils.Quaternion): A quaternion representing the rotation.
+
+    Returns:
+    tuple: A tuple of three floats representing the Euler angles (in radians).
+    """
+    # Create a mathutils.Euler object from the input quaternion
+    euler = quaternion.to_euler('XYZ')
+    
+    # Convert the Euler angles to a tuple
+    euler_angles = (euler.x, euler.y, euler.z)
+    
+    return euler_angles
+
+
+def euler_to_quaternion(euler_angles):
+    """
+    Convert Euler angles to quaternion.
+
+    Parameters:
+    euler_angles (tuple): A tuple of three floats representing the Euler angles (in radians).
+
+    Returns:
+    mathutils.Quaternion: A quaternion representing the same rotation as the Euler angles.
+    """
+    # Create a mathutils.Euler object from the input angles
+    euler = mathutils.Euler(euler_angles, 'XYZ')
+    
+    # Convert the Euler angles to a quaternion
+    quaternion = euler.to_quaternion()
+    
+    return quaternion

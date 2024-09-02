@@ -14,6 +14,9 @@ class Property(GGMolvisArtist):
     """Class for the property of the visulizations."""
     timeseries: Union[np.ndarray, int] = 0
 
+    def update_frame(self, frame):
+        # TODO: Implement the update_frame method
+        pass
 
 class Color(Property):
     """Class for the color."""

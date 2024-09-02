@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field, validator, ValidationError
 
 from . import SESSION
 
-class GGMolvisArtist:
+class GGMolvisArtist(ABC):
     """Abstract class for all visualizations. It contains the MNSession in which
        every object is linked to and frame mapping functionality."""
     def __init__(self,
@@ -30,7 +30,6 @@ class GGMolvisArtist:
         self._visible = visible
         self._z_order = z_order
 
-        self.draw()
         bpy.context.view_layer.update()
 
 
@@ -42,12 +41,11 @@ class GGMolvisArtist:
     def name(self):
         return self._name
     
-
     @name.setter
     def name(self, value):
         self._name = value
-    
 
+    
     @property
     def z_order(self):
         return self._z_order
@@ -56,12 +54,6 @@ class GGMolvisArtist:
     @z_order.setter
     def z_order(self, value):
         self._z_order = value
-    
-
-    @abstractmethod
-    def draw(self):
-        """Abstract method to draw the object within the session"""
-        pass
     
 
     def set_visible(self, visibility):
@@ -77,8 +69,3 @@ class GGMolvisArtist:
     def remove(self):
         """Remove the object from the session"""
         self.session.remove(self)
-
-
-class DynamicGGMolvisArtist(GGMolvisArtist):
-    """Abstract class for all dynamic visualizations."""
-    pass

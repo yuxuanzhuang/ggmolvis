@@ -14,6 +14,19 @@ class Visualizer(GGMolvisArtist):
         visualizer_name = AVAILABLE_VISUALIZERS.get(analysis.__class__.__name__)
         visualizer = get_visualizer(analysis, **kwargs)
         return visualizer
+
+    def update_frame(self, frame):
+        # TODO: Implement this method
+        pass
+
+    @property
+    def camera(self):
+        return self._camera
+    
+    def render(self):
+        self.camera.render()
+
+
 AVAILABLE_VISUALIZERS = {}
 
 def register_visualizer(analysis_name: str):

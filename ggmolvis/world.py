@@ -7,14 +7,13 @@ from typing import Tuple, List, Union
 
 from .base import GGMolvisArtist
 from . import SESSION
-from .utils import convert_list_to_array
+from .utils import convert_list_to_array, euler_to_quaternion
 
 class WorldTransformation(BaseModel):
     coordinates: Union[Tuple[float, float, float], List[Tuple[float, float, float]]] = Field(
         ...,
         description="Static transformation (x, y, z) or a list/array of transformations for animation"
     )
-
 
     @validator('coordinates', pre=True)
     def convert_lists_to_array(cls, value):
@@ -27,12 +26,16 @@ class WorldTransformation(BaseModel):
     def get_transformation_for_frame(self, frame: int) -> Tuple[float, float, float]:
         """Retrieve the coordinates for a specific frame"""
         if self.coordinates.ndim == 2:
-            index = frame % len(self.coordinates)
-            return self.coordinates[index]
+            if frame >= len(self.coordinates):
+                frame = -1
+            return np.radians(self.coordinates[frame])
         elif self.coordinates.ndim == 1:
-            return self.coordinates
+            return np.radians(self.coordinates)
         else:
             raise ValueError("Invalid transformation coordinates")
+
+    def set_coordinates(self, coordinates):
+        self.coordinates = convert_list_to_array(coordinates)
         
 class Location(WorldTransformation):
     # The location can be either a static tuple or a list of tuples for animations
@@ -48,10 +51,10 @@ class Location(WorldTransformation):
         """Apply location to the object, considering if it's static or animated"""
         if isinstance(self.coordinates, np.ndarray):
             # Static location
-            obj.location = self.coordinates * self.world_scale
+            obj.location = self.coordinates
         elif isinstance(self.coordinates, list):
             # Animated location
-            obj.location = self.get_transformation_for_frame(frame) * self.world_scale
+            obj.location = self.get_transformation_for_frame(frame)
         
 
 class Rotation(WorldTransformation):
@@ -66,11 +69,20 @@ class Rotation(WorldTransformation):
     def apply_to(self, obj, frame: int = 0):
         """Apply rotation to the object, considering if it's static or animated"""
         if isinstance(self.coordinates, np.ndarray):
-            # Static rotation
-            obj.rotation_euler = self.coordinates
+            # Static rotation to rad
+            obj.rotation_euler = np.radians(self.coordinates)
         elif isinstance(self.coordinates, list):
             # Animated rotation
             obj.rotation_euler = self.get_transformation_for_frame(frame)
+    
+    @property
+    def quaternion(self):
+        """Return the quaternion representation of the rotation"""
+        return euler_to_quaternion(self.coordinates)
+    
+    def from_quaternion(self, quaternion):
+        """Set the rotation from a quaternion"""
+        self.coordinates = quaternion.to_euler()
 
 
 class Scale(WorldTransformation):
@@ -97,10 +109,11 @@ class World(GGMolvisArtist):
     scale: Scale
     
     def __init__(self,
+                 name=None,
                  location=None,
                  rotation=None,
                  scale=None):
-        super().__init__()
+        super().__init__(name=name)
         if location is None:
             location = (0.0, 0.0, 0.0)
         if rotation is None:
@@ -111,9 +124,9 @@ class World(GGMolvisArtist):
         self.rotation = Rotation(rotation=rotation)
         self.scale = Scale(scale=scale)
     
-    def draw(self):
-        """Implement the draw method"""
-        # This method would typically apply transformations to objects in the session
+    def update_frame(self, frame_number):
+        """Not implemented in the World class"""
+        # TODO: Is it necessary to implement this method?
         pass
     
     def apply_to(self, obj, frame: int = 0):
@@ -121,3 +134,15 @@ class World(GGMolvisArtist):
         self.location.apply_to(obj, frame)
         self.rotation.apply_to(obj, frame)
         self.scale.apply_to(obj, frame)
+
+    @property
+    def matrix_world(self):
+        """Return the 4D world matrix"""
+
+        mat_world = np.zeros((4, 4))
+
+        # convert rotation x, y, z to quaternion
+        rot_mat = self.rotation.quaternion
+        mat_world[:3, :3] = rot_mat.to_matrix()
+        mat_world[:3, 3] = self.location.coordinates
+        mat_world[-1, -1] = self.scale

@@ -28,33 +28,39 @@ class Camera(GGMolvisArtist):
         self.clip_end = clip_end
         
         self.camera = bpy.data.cameras.new(name if name else "Camera")
-        self.camera_obj = bpy.data.objects.new(self.camera.name, self.camera)
-        bpy.context.scene.collection.objects.link(self.camera_obj)
+        camera_obj = bpy.data.objects.new(self.camera.name, self.camera)
+        _ = bpy.context.scene.collection.objects.link(camera_obj)
+        self.name = camera_obj.name
         self.camera.lens = self.lens
         self.camera.clip_start = self.clip_start
         self.camera.clip_end = self.clip_end
 
         self.set_view()
         
-        
+    @property
+    def object(self):
+        return bpy.data.objects[self.name]
+    
     def update_frame(self, frame_number):
         """Update the camera's state for the given frame"""
-        self.world.apply_to(self.camera_obj, frame_number)
+        self.world.apply_to(self.object, frame_number)
     
     
     def set_view(self):
         """Set the current view to this camera"""
-        bpy.context.scene.camera = self.camera_obj
+        bpy.context.scene.camera = self.object
 
-    @property
-    def object(self):
-        return self.camera_obj
+    def set_position(self, location, rotation):
+        """Set the position of the camera"""
+        self.world.location = location
+        self.world.rotation = rotation
     
     def render(self,
                frame=None,
                filepath=None,
                resolution=(1920, 1080)):
         """Render the scene with this camera"""
+        bpy.context.scene.camera = self.object
         if frame is not None:
             bpy.context.scene.frame_set(frame)
 
@@ -64,3 +70,5 @@ class Camera(GGMolvisArtist):
         renderer.render()
         
         renderer.display_in_notebook()
+
+
