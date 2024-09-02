@@ -31,3 +31,5 @@ def update_frame(scene):
             # remove the artist
             SESSION._ggmolvis.remove(artist)
 frame_change_post.append(update_frame)
+
+from .analysis import Visualizer

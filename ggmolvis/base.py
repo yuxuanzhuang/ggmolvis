@@ -23,9 +23,9 @@ class GGMolvisArtist:
         self.session = session
         self.world_scale = world_scale
         if not hasattr(self.session, '_ggmolvis'):
-            self.session._ggmolvis = []
+            self.session._ggmolvis = set()
 
-        self.session._ggmolvis.append(self)
+        self.session._ggmolvis.add(self)
         self._name = name if name else self.__class__.__name__
         self._visible = visible
         self._z_order = z_order

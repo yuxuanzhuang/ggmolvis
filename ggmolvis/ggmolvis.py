@@ -21,8 +21,20 @@ from .molecules import Molecule
 
 class GGMolVis(GGMolvisArtist):
     """Top level class that contains all the elements of the visualization."""
+    def __new__(cls, session=SESSION):
+        if hasattr(session, 'ggmolvis'):
+            # If SESSION already has an instance, return that instance
+            return session.ggmolvis
+        
+        # Otherwise, create a new instance
+        instance = super().__new__(cls)
+        session.ggmolvis = instance  # Store the instance in SESSION
+        return instance
+    
+
     def __init__(self, session=SESSION):
         super().__init__(session)
+        self.session.ggmolvis = self
         self.artists = []
         self._artists_dict = {
             'molecules': [],
