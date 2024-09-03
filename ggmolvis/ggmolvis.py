@@ -16,8 +16,8 @@ from .camera import Camera
 from .light import Light
 from .properties import Color, Material
 from .sceneobjects import SceneObject, Text
-from .shape import Shape, Line
-from .molecules import Molecule
+from .sceneobjects import Shape, Line
+from .sceneobjects import Molecule
 
 
 class GGMolVis(GGMolvisArtist):
@@ -52,6 +52,8 @@ class GGMolVis(GGMolvisArtist):
         self._global_world = self.worlds[0]
 
         self._global_camera = self.cameras[0]
+
+        self._subframes = 0
 
         # pre-defined camera position
         self._global_camera.world.location.set_coordinates((0, -4, 1.3))
@@ -100,6 +102,16 @@ class GGMolVis(GGMolvisArtist):
     def global_camera(self):
         return self._global_camera
     
+    @property
+    def subframes(self):
+        return self._subframes
+    
+    @subframes.setter
+    def subframes(self, value):
+        self._subframes = value
+        for molecule in self.molecules:
+            molecule.trajectory.subframes = value
+
     def set_scene(self):
         """Set up the scene with transparent background and CYCLES rendering."""
         bpy.context.scene.render.engine = 'CYCLES'
@@ -108,13 +120,15 @@ class GGMolVis(GGMolvisArtist):
     def molecule(self,
                  universe: Union[mda.AtomGroup, mda.Universe],
                  style: str = 'spheres',
-                 subframes: int = 0,
                  name: str = 'atoms',
-                 world: World = None):
+                 world: World = None,
+                 color='default',
+                 material='MN Default'):
         molecule = Molecule(atomgroup=universe,
                             style=style,
-                            subframes=subframes,
-                            name=name)
+                            name=name,
+                            color=color,
+                            material=material)
 
         if world is not None:
             molecule.world = world
@@ -126,9 +140,12 @@ class GGMolVis(GGMolvisArtist):
     def line(self,
              start_points: np.ndarray,
              end_points: np.ndarray,
-             world: World = None):
+             world: World = None,
+             color='black',
+             material='Backdrop'
+             ):
         
-        line = Line(start_points, end_points)
+        line = Line(start_points, end_points, color=color, material=material)
         if world is not None:
             line.world = world
         else:

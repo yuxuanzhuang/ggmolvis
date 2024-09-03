@@ -42,3 +42,6 @@ frame_change_post.append(update_frame)
 
 # add visualize function to AnalysisBase
 from .analysis import Visualizer
+
+from .ggmolvis import GGMolVis
+GGMOLVIS = GGMolVis()

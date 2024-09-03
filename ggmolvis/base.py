@@ -64,7 +64,18 @@ class GGMolvisArtist(ABC):
     def update_frame(self, frame):
         """Abstract method to update the object's state for the given frame"""
         pass
-    
+
+    @property
+    def ggmolvis(self):
+        return self.session.ggmolvis
+
+    @property
+    def subframes(self):
+        return self.ggmolvis.subframes
+
+    @subframes.setter
+    def subframes(self, value):
+        self.ggmolvis.subframes = value
 
     def remove(self):
         """Remove the object from the session"""
