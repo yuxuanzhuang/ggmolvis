@@ -1,4 +1,4 @@
-from .visualizer import Visualizer
+from .base import Visualizer
 from ..sceneobjects import Molecule
 from ..ggmolvis import GGMolVis
 

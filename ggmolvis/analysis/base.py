@@ -15,7 +15,7 @@ class Visualizer(GGMolvisArtist):
         visualizer = get_visualizer(analysis, **kwargs)
         return visualizer
 
-    def update_frame(self, frame):
+    def _update_frame(self, frame):
         # TODO: Implement this method
         pass
 
