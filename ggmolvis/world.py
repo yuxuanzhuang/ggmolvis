@@ -1,12 +1,10 @@
 import bpy
 import molecularnodes as mn
-import MDAnalysis as mda
 import numpy as np
 from pydantic import BaseModel, Field, validator, ValidationError
 from typing import Tuple, List, Union
 
 from .base import GGMolvisArtist
-from . import SESSION
 from .utils import convert_list_to_array, euler_to_quaternion
 
 class WorldTransformation(BaseModel):
@@ -109,12 +107,10 @@ class World(GGMolvisArtist):
     scale: Scale
     
     def __init__(self,
-                 name=None,
                  location=None,
                  rotation=None,
                  scale=None):
         super().__init__()
-        self.name = name
         if location is None:
             location = (0.0, 0.0, 0.0)
         if rotation is None:
