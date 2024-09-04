@@ -31,9 +31,9 @@ bpy.ops.wm.open_mainfile(filepath=mn_template_file)
 @persistent
 def update_frame(scene):
     for artist in SESSION._ggmolvis:
-        artist.update_frame(scene.frame_current)
+        artist._update_frame(scene.frame_current)
 #        try:
-#            artist.update_frame(scene.frame_current)
+#            artist._update_frame(scene.frame_current)
 #        except:
             # if the object under the artist is deleted,
             # remove the artist

@@ -113,7 +113,8 @@ class World(GGMolvisArtist):
                  location=None,
                  rotation=None,
                  scale=None):
-        super().__init__(name=name)
+        super().__init__()
+        self.name = name
         if location is None:
             location = (0.0, 0.0, 0.0)
         if rotation is None:
@@ -124,7 +125,7 @@ class World(GGMolvisArtist):
         self.rotation = Rotation(rotation=rotation)
         self.scale = Scale(scale=scale)
     
-    def update_frame(self, frame_number):
+    def _update_frame(self, frame_number):
         """Not implemented in the World class"""
         # TODO: Is it necessary to implement this method?
         pass

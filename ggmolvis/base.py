@@ -1,42 +1,35 @@
 import bpy
 from abc import ABC, abstractmethod
 import molecularnodes as mn
-from molecularnodes.entities.trajectory import Trajectory
-from molecularnodes.entities.trajectory.selections import Selection
 import MDAnalysis as mda
 import numpy as np
 from typing import Union
-from pydantic import BaseModel, Field, validator, ValidationError
 
 from . import SESSION
 
 class GGMolvisArtist(ABC):
     """Abstract class for all visualizations. It contains the MNSession in which
        every object is linked to and frame mapping functionality."""
-    def __init__(self,
-                 session: mn.session.MNSession = SESSION,
-                 world_scale: float = 0.01,
-                 name: str = None,
-                 visible: bool = True,
-                 z_order: int = 0):
+    def __init__(self):
+        # only one MNSession will be used to keep everything in sync.
+        self._session = SESSION
 
-        self.session = session
-        self.world_scale = world_scale
+        # default world_scale value used in Molecular Node
+        self._world_scale = 0.01
+        self._visible = True
+        self._z_order = 0
+        self._name = self.__class__.__name__
+
+        #
         if not hasattr(self.session, '_ggmolvis'):
             self.session._ggmolvis = set()
 
         self.session._ggmolvis.add(self)
-        self._name = name if name else self.__class__.__name__
-        self._visible = visible
-        self._z_order = z_order
 
+        # when creating a new rendering object
+        # always update the blender view layer
         bpy.context.view_layer.update()
 
-
-    @property
-    def visible(self):
-        return self._visible
-    
     @property
     def name(self):
         return self._name
@@ -45,23 +38,42 @@ class GGMolvisArtist(ABC):
     def name(self, value):
         self._name = value
 
+    @property
+    def world_scale(self):
+        return self._world_scale
     
+    @world_scale.setter
+    def world_scale(self, value):
+        self._world_scale = value
+    
+    @property
+    def visible(self):
+        return self._visible
+
+    @visible.setter
+    def visible(self, value):
+        self._visible = value
+
     @property
     def z_order(self):
         return self._z_order
-    
 
     @z_order.setter
     def z_order(self, value):
         self._z_order = value
-    
 
-    def set_visible(self, visibility):
-        self._visible = visibility
+    @property
+    def session(self):
+        return self._session    
     
+    def set_visible(self):
+        self._visible = True
+
+    def set_invisible(self):
+        self._visible = False
 
     @abstractmethod
-    def update_frame(self, frame):
+    def _update_frame(self, frame):
         """Abstract method to update the object's state for the given frame"""
         pass
 
@@ -77,6 +89,6 @@ class GGMolvisArtist(ABC):
     def subframes(self, value):
         self.ggmolvis.subframes = value
 
-    def remove(self):
+    def _remove(self):
         """Remove the object from the session"""
         self.session.remove(self)

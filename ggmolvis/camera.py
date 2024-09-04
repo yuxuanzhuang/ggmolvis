@@ -41,7 +41,7 @@ class Camera(GGMolvisArtist):
     def object(self):
         return bpy.data.objects[self.name]
     
-    def update_frame(self, frame_number):
+    def _update_frame(self, frame_number):
         """Update the camera's state for the given frame"""
         self.world.apply_to(self.object, frame_number)
     

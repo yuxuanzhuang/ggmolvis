@@ -22,24 +22,24 @@ from .sceneobjects import Molecule
 
 class GGMolVis(GGMolvisArtist):
     """Top level class that contains all the elements of the visualization."""
-    def __new__(cls, session=SESSION):
-        if hasattr(session, 'ggmolvis'):
+    def __new__(cls):
+        if hasattr(SESSION, 'ggmolvis'):
             # If SESSION already has an instance, return that instance
-            return session.ggmolvis
+            return SESSION.ggmolvis
         print("Creating new GGMolVis")
         # Otherwise, create a new instance
         instance = super().__new__(cls)
-        session.ggmolvis = instance  # Store the instance in SESSION
+        SESSION.ggmolvis = instance  # Store the instance in SESSION
         instance._initialized = False
         return instance
     
 
-    def __init__(self, session=SESSION):
+    def __init__(self):
         if self._initialized:
             return
         self._initialized = True
 
-        super().__init__(session)
+        super().__init__()
         self.session.ggmolvis = self
         self._artists_dict = {
             'molecules': [],
@@ -62,13 +62,19 @@ class GGMolVis(GGMolvisArtist):
         # set up the scene
         self.set_scene()
 
-        self.update_frame(bpy.context.scene.frame_current)
+        self._update_frame(bpy.context.scene.frame_current)
 
 
-    def update_frame(self, frame_number):
+    def _update_frame(self, frame_number):
         """Update the camera's state for the given frame"""
+        for artist in self._artists:
+            artist._update_frame(frame_number)
+
         self._global_camera.world.apply_to(self._global_camera.object, frame_number)
 
+    @property
+    def _artists(self):
+        return [item for sublist in self._artists_dict.values() for item in sublist]
 
     @property
     def molecules(self):
@@ -123,7 +129,7 @@ class GGMolVis(GGMolvisArtist):
                  name: str = 'atoms',
                  world: World = None,
                  color='default',
-                 material='MN Default'):
+                 material='default'):
         molecule = Molecule(atomgroup=universe,
                             style=style,
                             name=name,
@@ -142,7 +148,7 @@ class GGMolVis(GGMolvisArtist):
              end_points: np.ndarray,
              world: World = None,
              color='black',
-             material='Backdrop'
+             material='backdrop'
              ):
         
         line = Line(start_points, end_points, color=color, material=material)
