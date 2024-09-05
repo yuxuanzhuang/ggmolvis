@@ -1,7 +1,7 @@
 import bpy
 import molecularnodes as mn
 import numpy as np
-from pydantic import BaseModel, Field, validator, ValidationError
+from pydantic import BaseModel, Field, field_validator
 from typing import Tuple, List, Union
 
 from .base import GGMolvisArtist
@@ -13,7 +13,7 @@ class WorldTransformation(BaseModel):
         description="Static transformation (x, y, z) or a list/array of transformations for animation"
     )
 
-    @validator('coordinates', pre=True)
+    @field_validator('coordinates', mode='before')
     def convert_lists_to_array(cls, value):
         return convert_list_to_array(value)
 
