@@ -8,8 +8,32 @@ from typing import Union
 from . import SESSION
 
 class GGMolvisArtist(ABC):
-    """Abstract class for all visualizations. It contains the MNSession in which
-       every object is linked to and frame mapping functionality."""
+    """Abstract class for all visualizations in GGMolVis.
+    It creates a link to the `MNSession` in Molecular Nodes.    
+    Every `GGMolvisArtist` object will be stored inside the
+    `MNSession._ggmolvis`.
+
+    Properties:
+    -----------
+    name: str
+        Name of the object. Default is the class name.
+    world_scale: float
+        The scale of the object in the world. It is different
+        from the scale in Blender as it is directly applied to
+        the coordinates of the object. Default is 0.01
+    visible: bool
+        Visibility of the object. Default is True
+    z_order: int
+        Z-order of the object. The object with higher z-order
+        will be rendered on top of the object with lower z-order. Default is 0
+    session: MNSession
+        The linked `MNSession` object in molecularnodes package
+    ggmolvis: set
+        The set of all `GGMolvisArtist` objects in the session
+    subframes: int
+        Number of subframes to render. It will be a global setting
+        for all objects. Default is 1
+    """
     def __init__(self):
         # only one MNSession will be used to keep everything in sync.
         self._session = SESSION
@@ -67,9 +91,11 @@ class GGMolvisArtist(ABC):
         return self._session    
     
     def set_visible(self):
+        """Set the object to be visible"""
         self._visible = True
 
     def set_invisible(self):
+        """Set the object to be invisible"""
         self._visible = False
 
     @abstractmethod
@@ -91,4 +117,4 @@ class GGMolvisArtist(ABC):
 
     def _remove(self):
         """Remove the object from the session"""
-        self.session.remove(self)
+        self.session._ggmolvis.remove(self)

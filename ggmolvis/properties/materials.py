@@ -3,20 +3,7 @@ from typing import Union
 
 from ..utils.node import set_material as set_material_mn
 from .base import Property
-
-
-materials_mapping = {
-    "default": "MN Default",
-    "flat": "MN Flat Outline",
-    "squishy": "MN Squishy",
-    "transparent": "MN Transparent Outline",
-    "ambient": "MN Ambient Occlusion",
-    # backdrop for all other shapes
-    "backdrop": "Backdrop",
-}
-
-AVAILABLE_MATERIALS = materials_mapping.keys()
-
+from ..utils import materials_mapping, AVAILABLE_MATERIALS
 
 class Material(Property):
     """Class for the material."""

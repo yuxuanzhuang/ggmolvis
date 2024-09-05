@@ -2,6 +2,7 @@ import bpy
 from abc import ABC, abstractmethod
 
 from molecularnodes.utils import lerp
+from molecularnodes.blender import coll
 import numpy as np
 from typing import Tuple, List, Union
 
@@ -62,7 +63,7 @@ class Line(Shape):
         line_data = bpy.data.curves.new(name=self.name, type="CURVE")
         line_data.dimensions = "3D"
         self.line_object = bpy.data.objects.new(self.name, line_data)
-        bpy.context.scene.collection.objects.link(self.line_object)
+        coll.mn().objects.link(self.line_object)
 
         line = line_data.splines.new("POLY")
         self.line = line
@@ -77,13 +78,14 @@ class Line(Shape):
         line_data.bevel_resolution = 10
 
         self._update_frame(bpy.context.scene.frame_current)
+        return self.line_object
 
     def draw(self):
         pass
 
     def _update_frame(self, frame):
         object = self.object
-        start_point, end_point = self.get_points_for_frame(frame)
+        start_point, end_point = self._get_points_for_frame(frame)
         object.data.splines[0].points[0].co = (
             start_point[0],
             start_point[1],
@@ -98,7 +100,7 @@ class Line(Shape):
         )
         self.world.apply_to(object, frame)
 
-    def get_points_for_frame(self, frame: int) -> Tuple[float, float, float]:
+    def _get_points_for_frame(self, frame: int) -> Tuple[float, float, float]:
         """Retrieve the coordinates for a specific frame"""
 
         if self.subframes == 0:
@@ -109,7 +111,7 @@ class Line(Shape):
         # get the next frame
         frame_b = frame_a + 1
         if frame_b >= self.start_points.shape[0]:
-            return None
+            return self.start_points[-1], self.end_points[-1]
 
         locations_a = []
         locations_b = []

@@ -1,8 +1,9 @@
 import bpy
 import molecularnodes as mn
+from molecularnodes.blender import coll
+
 import MDAnalysis as mda
 import numpy as np
-from pydantic import BaseModel, Field, validator, ValidationError
 from typing import Tuple, List, Union
 
 from .base import GGMolvisArtist
@@ -16,7 +17,7 @@ class Camera(GGMolvisArtist):
                  name=None,
                  location=None,
                  rotation=None,
-                 lens=35.0,
+                 lens=24.0,
                  clip_start=0.1,
                  clip_end=1000.0):
         super().__init__()
@@ -29,7 +30,6 @@ class Camera(GGMolvisArtist):
         
         self.camera = bpy.data.cameras.new(name if name else "Camera")
         camera_obj = bpy.data.objects.new(self.camera.name, self.camera)
-        _ = bpy.context.scene.collection.objects.link(camera_obj)
         self.name = camera_obj.name
         self.camera.lens = self.lens
         self.camera.clip_start = self.clip_start
@@ -55,6 +55,12 @@ class Camera(GGMolvisArtist):
         self.world.location = location
         self.world.rotation = rotation
     
+    def _move_to_collection(self, name):
+        """Move the object to the collection with the same name"""
+        coll_obj = coll.mn().children.get(name)
+        coll_obj.objects.link(self.object)
+
+
     def render(self,
                frame=None,
                filepath=None,

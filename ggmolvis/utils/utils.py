@@ -1,7 +1,10 @@
 import numpy as np
+from functools import wraps
 
 import bpy
 import mathutils
+from molecularnodes.blender.nodes import styles_mapping as mol_styles_mapping
+
 
 def convert_list_to_array(value):
     if isinstance(value, np.ndarray):
@@ -80,3 +83,46 @@ def euler_to_quaternion(euler_angles):
     quaternion = euler.to_quaternion()
     
     return quaternion
+
+
+
+materials_mapping = {
+    "default": "MN Default",
+    "flat": "MN Flat Outline",
+    "squishy": "MN Squishy",
+    "transparent": "MN Transparent Outline",
+    "ambient": "MN Ambient Occlusion",
+    # backdrop for all other shapes
+    "backdrop": "Backdrop",
+}
+
+AVAILABLE_MATERIALS = materials_mapping.keys()
+
+AVAILABLE_STYLES = ["default"]
+MOL_AVAILABLE_STYLES = mol_styles_mapping.keys()
+
+
+def validate_properties(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # Extract keyword arguments
+        style = kwargs.get('style', 'spheres')
+        color = kwargs.get('color', 'default')
+        material = kwargs.get('material', 'default')
+        
+        # Validate style
+        if style not in MOL_AVAILABLE_STYLES:
+            raise ValueError(f"Invalid style '{style}'. Valid options are: {MOL_AVAILABLE_STYLES}")
+                
+        # Validate color
+        #if color not in VALID_COLORS:
+        #    raise ValueError(f"Invalid color '{color}'. Valid options are: {VALID_COLORS}")
+        
+        # Validate material
+        if material not in AVAILABLE_MATERIALS:
+            raise ValueError(f"Invalid material '{material}'. Valid options are: {AVAILABLE_MATERIALS}")
+        
+        # Call the original function
+        return func(*args, **kwargs)
+    
+    return wrapper

@@ -33,15 +33,18 @@ class SceneObject(GGMolvisArtist):
     ):
         self.world = World(location=location, rotation=rotation, scale=scale)
         super().__init__()
-        self._name = self.__class__.__name__
+        self.name = name
 
         self._subframes = 0
 
-        self._create_object()
+        obj = self._create_object()
+        self.name = obj.name
         self._init_color(color)
         self._init_material(material)
         self._init_style(style)
         self._init_camera()
+        self._move_to_collection()
+
         self.draw()
         self._update_frame(bpy.context.scene.frame_current)
 
@@ -75,6 +78,18 @@ class SceneObject(GGMolvisArtist):
         self.camera.object.matrix_world = rotation_camera
         self.camera.world.location.set_coordinates(camera_center)
 
+    def _move_to_collection(self):
+        """Move the object to the collection with the same name"""
+        mn_coll = bpy.data.collections.get('MolecularNodes')
+        coll = mn_coll.children.get(self.name)
+        if coll is None:
+            coll = bpy.data.collections.new(self.name)
+            mn_coll.children.link(coll)
+        coll.objects.link(self.object)
+        mn_coll.objects.unlink(self.object)
+        self.camera._move_to_collection(self.name)
+
+
     def _update_frame(self, frame):
         object = self.object
         self.material.apply_to(object, frame)
@@ -86,6 +101,14 @@ class SceneObject(GGMolvisArtist):
 
     @abstractmethod
     def _create_object(self):
+        """Create the object
+
+        Returns
+        -------
+        bpy.types.Object
+            The created object
+        """
+
         raise NotImplementedError(
             "This method is only available in the subclass"
         )
@@ -101,6 +124,14 @@ class SceneObject(GGMolvisArtist):
     @property
     def object(self):
         return bpy.data.objects[self.name]
+    
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
 
     def set_style(self, style):
         self.style.set_style(style)

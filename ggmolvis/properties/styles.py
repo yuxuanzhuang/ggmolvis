@@ -2,13 +2,12 @@ from .base import Property
 from molecularnodes.blender.nodes import styles_mapping as mol_styles_mapping
 from ..utils.node import swap_style
 
-MOL_AVAILABLE_STYLES = mol_styles_mapping.keys()
-
+from ..utils import MOL_AVAILABLE_STYLES, AVAILABLE_STYLES
 
 class Style(Property):
     """Class for the style."""
 
-    AVAILABLE_STYLES = ["default"]
+    AVAILABLE_STYLES = AVAILABLE_STYLES
 
     def _set_property(self):
         style_name = self.property_name

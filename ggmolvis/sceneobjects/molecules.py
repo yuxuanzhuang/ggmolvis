@@ -15,7 +15,7 @@ class Molecule(SceneObject):
     """Class for a molecule."""
     def __init__(
         self,
-        atomgroup: Union[mda.AtomGroup, mda.Universe],
+        atomgroup: mda.AtomGroup,
         name: str = "atoms",
         location=None,
         rotation=None,
@@ -26,8 +26,8 @@ class Molecule(SceneObject):
     ):
         """Show the molecule."""
 
-        self.universe = atomgroup if isinstance(atomgroup, mda.Universe) else atomgroup.universe
-        self.atomgroup = atomgroup if isinstance(atomgroup, mda.AtomGroup) else self.universe.atoms
+        self.atomgroup = atomgroup
+        self.universe = atomgroup.universe
 
         # molecules need style name to create object
         self._style_name = style
@@ -56,6 +56,7 @@ class Molecule(SceneObject):
         )
         # only render the selection
         set_selection(self.object, self.name)
+        return self.object
     
     def draw(self):
         pass
