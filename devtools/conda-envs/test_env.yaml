@@ -6,9 +6,7 @@ dependencies:
   # Base depends
   - python
   - pip
-  - molecularnodes
   - pydantic
-  - bpy
 
   # MDAnalysis
   - MDAnalysis
@@ -20,6 +18,8 @@ dependencies:
   - codecov
 
   # Pip-only installs
-  #- pip:
+  - pip:
+    - molecularnodes
+    - bpy
   #  - codecov
 
