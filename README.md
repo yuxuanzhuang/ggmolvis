@@ -21,12 +21,16 @@ ggmolvis
 [url_license]: https://www.gnu.org/licenses/gpl-2.0
 [url_mda]: https://www.mdanalysis.org
 
-Molecular visualization with Blender.
-
-### Features
-
-- **ggmolvis** is a Python package that provides a high-level interface to
+**GGMolVis** is a Python package that provides a high-level interface to [MolecularNodes](https://github.com/BradyAJohnston/MolecularNodes) in
   [Blender](https://www.blender.org/) for molecular visualization.
+
+It is inspired by the design patterns of ggplot2 and matplotlib. The goal is to create a stable Python API that enables users to visualize molecular trajectories (and potentially other entities in MN) with both automation and customization. Everything is designed to be dynamic during frame changes. The package also includes capabilities to visualize protein features and analysis results---such as distances, angles, and dihedrals---with texts, lines, and shapes.
+
+### Features (planned)
+
+- Trajectory visualization in jupyter notebook.
+- Customizable feature visualization.
+- Analysis result visualization.
 
 
 ggmolvis is bound by a [Code of Conduct](https://github.com/yuxuanzhuang/ggmolvis/blob/main/CODE_OF_CONDUCT.md).
@@ -89,6 +93,35 @@ the dependencies required for tests and docs with:
 
 ```
 pip install ".[test,doc]"
+```
+
+### Quickstart
+
+```python
+import MDAnalysis as mda
+from MDAnalysis.tests.datafiles import PSF, DCD
+from MDAnalysis.analysis.rms import RMSD
+
+from ggmolvis.ggmolvis import GGMolVis
+
+u = mda.Universe(PSF, DCD)
+
+# Trajectory visualization
+residues_ag = u.select_atoms("resid 127 40")
+residues_ag.visualize()
+
+# Feature visualization
+res_1 = residues_ag.residues[0].atoms
+res_2 = residues_ag.residues[1].atoms
+line = ggmv.distance(res_1, res_2, location=(5,0,0))
+line.render()
+
+# Analysis result visualization
+rmsd = RMSD(u.select_atoms('name CA'))
+rmsd.run()
+vis = rmsd.visualize()
+vis.render(mode='movie')
+
 ```
 
 ### Copyright
