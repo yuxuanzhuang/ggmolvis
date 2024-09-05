@@ -6,6 +6,9 @@ dependencies:
   # Base depends
   - python
   - pip
+  - molecularnodes
+  - pydantic
+  - bpy
 
   # MDAnalysis
   - MDAnalysis
