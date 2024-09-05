@@ -9,12 +9,19 @@ class RMSDVisualizer(Visualizer):
         mobile_atoms = analysis.mobile_atoms
         ggmv = GGMolVis()
         # create a molecule object for the mobile atoms
-        mobile_molecule = ggmv.molecule(mobile_atoms, style='spheres', name='mobile')
+        mobile_molecule = ggmv.molecule(mobile_atoms,
+                                        style='cartoon',
+                                        color='default',
+                                        name='rmsd')
 
         self._camera = mobile_molecule.camera
 
-        # set the color of the mobile atoms based on the RMSD values
-        # TODO: implement this
+        if not analysis.results:
+            analysis.run()
+        rmsd_results = analysis.results['rmsd'].T[2]
+        mobile_molecule.color.set_map(values=rmsd_results, cmap='coolwarm')
+
+        return ggmv
 
     @property
     def camera(self):

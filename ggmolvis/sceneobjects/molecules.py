@@ -7,8 +7,7 @@ from typing import Union
 
 from .base import SceneObject
 from ..utils.node import set_selection
-from ..properties import Color, MoleculeMaterial, MoleculeStyle
-
+from ..properties import MoleculeColor, MoleculeMaterial, MoleculeStyle
 
 
 class Molecule(SceneObject):
@@ -48,6 +47,9 @@ class Molecule(SceneObject):
     def _init_material(self, material="default"):
         self._material = MoleculeMaterial(self, material)
 
+    def _init_color(self, color="black"):
+        self._color = MoleculeColor(self, color)
+    
     def _create_object(self):
         traj = Trajectory(self.universe)
         self.trajectory = traj

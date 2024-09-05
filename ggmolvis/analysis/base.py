@@ -1,3 +1,4 @@
+import bpy
 from MDAnalysis.analysis.base import AnalysisBase
 from ..base import GGMolvisArtist
 
@@ -23,8 +24,10 @@ class Visualizer(GGMolvisArtist):
     def camera(self):
         return self._camera
     
-    def render(self):
-        self.camera.render()
+    def render(self, **kwargs):
+        # set the render movie end frame to the number of frames in the trajectory
+        bpy.context.scene.frame_end = self.analysis.atomgroup.universe.trajectory.n_frames
+        self.camera.render(**kwargs)
 
 
 AVAILABLE_VISUALIZERS = {}

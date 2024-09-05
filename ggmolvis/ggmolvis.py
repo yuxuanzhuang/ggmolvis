@@ -4,6 +4,7 @@ import molecularnodes as mn
 from molecularnodes.entities.trajectory import Trajectory
 from molecularnodes.entities.trajectory.selections import Selection
 import MDAnalysis as mda
+from MDAnalysis.core.groups import Atom, AtomGroup
 import numpy as np
 from typing import Union
 from pydantic import BaseModel, Field, validator, ValidationError
@@ -159,10 +160,14 @@ class GGMolVis(GGMolvisArtist):
         """Set up the scene with transparent background and CYCLES rendering."""
         bpy.context.scene.render.engine = 'CYCLES'
         bpy.context.scene.render.film_transparent = True
-
+        try:
+            bpy.context.scene.cycles.device = "GPU"
+        except:
+            pass
+        
     @validate_properties
     def molecule(self,
-                 universe: Union[mda.AtomGroup, mda.Universe],
+                 universe: Union[AtomGroup, mda.Universe],
                  style: str = 'spheres',
                  name: str = 'atoms',
                  location: Union[np.ndarray, list] = None,
@@ -207,6 +212,54 @@ class GGMolVis(GGMolvisArtist):
         self.molecules.append(molecule)
         return molecule
 
+    @validate_properties
+    def distance(self,
+                 atom1: Union[AtomGroup, Atom],
+                 atom2: Union[AtomGroup, Atom],
+                 name: str = 'distance',
+                 location: Union[np.ndarray, list] = None,
+                 rotation: Union[np.ndarray, list] = None,
+                 scale: Union[np.ndarray, list] = None,
+                 mol_color: str ='default',
+                 mol_material: str ='ambient',
+                 mol_style: str ='sphere',
+                 line_color: str ='black',
+                 line_material: str ='backdrop',
+                 line_style: str ='default',
+                 ):
+        """Create a `Distance` object and add it to the visualization.
+        """
+        if atom1.universe != atom2.universe:
+            raise ValueError("The atoms belong to different universes")
+        mol_atoms = Molecule(atomgroup=AtomGroup(atom1 + atom2),
+                            style=mol_style,
+                            name=f'{name}_atoms',
+                            color=mol_color,
+                            location=location,
+                            rotation=rotation,
+                            scale=scale,
+                            material=mol_material)
+        
+        start_points = np.zeros((atom1.universe.trajectory.n_frames, 3))
+        end_points = np.zeros((atom1.universe.trajectory.n_frames, 3))
+
+        for i, ts in enumerate(atom1.universe.trajectory):
+            start_points[i] = atom1.center_of_mass()
+            end_points[i] = atom2.center_of_mass()
+        
+        line = Line(start_points=start_points,
+                    end_points=end_points,
+                    name=f'{name}_distance',
+                    location=location,
+                    rotation=rotation,
+                    scale=scale,
+                    color=line_color,
+                    material=line_material)
+        self.shapes.append(line)
+        self.molecules.append(mol_atoms)
+        return line
+        
+        
     @validate_properties
     def line(self,
              start_points: np.ndarray,

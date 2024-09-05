@@ -9,7 +9,7 @@ from typing import Tuple, List, Union
 from .base import GGMolvisArtist
 from .world import World, Location, Rotation
 from . import SESSION
-from .renderer import Renderer
+from .renderer import Renderer, MovieRenderer
 
 class Camera(GGMolvisArtist):
     """Class for the camera."""
@@ -61,19 +61,20 @@ class Camera(GGMolvisArtist):
 
 
     def render(self,
+               mode='image',
                frame=None,
                filepath=None,
-               resolution=(1920, 1080)):
+               resolution=(640, 360)):
         """Render the scene with this camera"""
         bpy.context.scene.camera = self.object
         if frame is not None:
             bpy.context.scene.frame_set(frame)
 
-        renderer = Renderer(resolution=resolution,
-                        filepath=filepath)
-        
+        if mode == 'image':        
+            renderer = Renderer(resolution=resolution,
+                                filepath=filepath)
+        elif mode == 'movie':
+            renderer = MovieRenderer(resolution=resolution,
+                            filepath=filepath)
         renderer.render()
-        
         renderer.display_in_notebook()
-
-

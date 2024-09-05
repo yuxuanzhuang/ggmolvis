@@ -34,7 +34,7 @@ def swap_style(object, style):
     
     # add DSSP node before that if cartoon style
     # kinda hacky
-    if style == 'Style Cartoon':
+    if style == 'Style Cartoon' and 'Topology DSSP' not in nodes.keys():
         nodes_mn = object.modifiers["MolecularNodes"].node_group
         add_custom(nodes_mn, name='Topology DSSP')
         dssp_node = nodes_mn.nodes['Topology DSSP']
@@ -44,8 +44,18 @@ def swap_style(object, style):
         # after Set Color
         links.new(dssp_node.inputs["Atoms"], nodes['Set Color'].outputs["Atoms"])
 
+def set_mn_color(object, color):
+    nodes, links = extract_mn_node(object)
+    nodes_mn = object.modifiers["MolecularNodes"].node_group
 
-def set_material(object, material):
+    color_node = nodes_mn.nodes['Set Color']
+    
+    # cannot remove link with
+    if color_node.inputs["Color"].links:
+        nodes_mn.links.remove(color_node.inputs["Color"].links[0])
+    color_node.inputs['Color'].default_value = color
+
+def set_mn_material(object, material):
     """Set the material."""
     nodes, links = extract_mn_node(object)
     style_lists = [s for s in nodes.keys()  if s.startswith("Style")]

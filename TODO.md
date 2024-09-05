@@ -18,6 +18,7 @@
 - [ ] add static objects (e.g. an AtomGroup not updating its position)
 - [ ] add a way to indicate no need to regenerate the object (e.g. a static object)
 - [ ] light control
+- [ ] sceneobject collection
 
 **Improvement**
 - [ ] use mathutils for vector math

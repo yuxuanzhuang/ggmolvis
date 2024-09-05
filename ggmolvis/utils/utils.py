@@ -121,27 +121,33 @@ AVAILABLE_MATERIALS = materials_mapping.keys()
 
 AVAILABLE_STYLES = ["default"]
 MOL_AVAILABLE_STYLES = mol_styles_mapping.keys()
+AVAILABLE_STYLES.extend(MOL_AVAILABLE_STYLES)
 
 
 def validate_properties(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         # Extract keyword arguments
-        style = kwargs.get('style', 'spheres')
-        color = kwargs.get('color', 'default')
-        material = kwargs.get('material', 'default')
+        # get all style kwargs
+        style_kwargs = {k: v for k, v in kwargs.items() if 'style' in k}
+        color_kwargs = {k: v for k, v in kwargs.items() if 'color' in k}
+        material_kwargs = {k: v for k, v in kwargs.items() if 'material' in k}
         
         # Validate style
-        if style not in MOL_AVAILABLE_STYLES:
-            raise ValueError(f"Invalid style '{style}'. Valid options are: {MOL_AVAILABLE_STYLES}")
-                
+        for style in style_kwargs.values():
+            if style not in AVAILABLE_STYLES:
+                raise ValueError(f"Invalid style '{style}'. "
+                                 f"Valid options are: {AVAILABLE_STYLES}")     
         # Validate color
-        #if color not in VALID_COLORS:
-        #    raise ValueError(f"Invalid color '{color}'. Valid options are: {VALID_COLORS}")
+        #for color in color_kwargs.values():
+        #    if color not in AVAILABLE_COLORS:
+        #        raise ValueError(f"Invalid color '{color}'. Valid options are: {AVAILABLE_COLORS}")
         
         # Validate material
-        if material not in AVAILABLE_MATERIALS:
-            raise ValueError(f"Invalid material '{material}'. Valid options are: {AVAILABLE_MATERIALS}")
+        for material in material_kwargs.values():
+            if material not in AVAILABLE_MATERIALS:
+                raise ValueError(f"Invalid material '{material}'. "
+                                 f"Valid options are: {AVAILABLE_MATERIALS}")
         
         # Call the original function
         return func(*args, **kwargs)

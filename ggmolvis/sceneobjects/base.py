@@ -152,8 +152,8 @@ class SceneObject(GGMolvisArtist):
         self.color.set_color(color)
         self.color._apply_to(self.object)
 
-    def render(self):
-        self.camera.render()
+    def render(self, **kwargs):
+        self.camera.render(**kwargs)
 
     @property
     def color(self):
@@ -178,3 +178,10 @@ class SceneObject(GGMolvisArtist):
     @material.setter
     def material(self, value):
         raise AttributeError("Use `set_material` instead")
+
+
+class SceneObjectCollection:
+    """Class for the collection of scene objects"""
+    #TODO: Implement the class
+    pass
+    
