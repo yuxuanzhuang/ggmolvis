@@ -1,7 +1,7 @@
 import bpy
 from typing import Union
 
-from ..utils.node import set_material as set_material_mn
+from ..utils.node import set_mn_material
 from .base import Property
 from ..utils import materials_mapping, AVAILABLE_MATERIALS
 
@@ -22,7 +22,7 @@ class Material(Property):
         # create a material copy
         default_material = bpy.data.materials[materials_mapping[material_name]]
         self.material = default_material.copy()
-        self.material.name = f"{self.name}_material"
+        self.material.name = f"{self.name}"
 
         self.material_name = self.material.name
 
@@ -31,11 +31,10 @@ class Material(Property):
         self._set_property(material_name)
 
     def _apply_to(self, obj, frame: int = 0):
-        # TODO: apply material to the object
-        pass
+        obj.data.materials.append(self.material)
 
 class MoleculeMaterial(Material):
     def _apply_to(self, obj, frame: int = 0):
         """Apply material to the object."""
 
-        set_material_mn(obj, self.material_name)
+        set_mn_material(obj, self.material_name)
