@@ -14,14 +14,14 @@ class WorldTransformation(BaseModel):
     )
 
     @field_validator('coordinates', mode='before')
-    def convert_lists_to_array(cls, value):
+    def _convert_lists_to_array(cls, value):
         return convert_list_to_array(value)
 
-    def apply_to(self, obj, frame: int = 0):
+    def _apply_to(self, obj, frame: int = 0):
         raise NotImplementedError("This method must be implemented in the subclass")
     
 
-    def get_transformation_for_frame(self, frame: int) -> Tuple[float, float, float]:
+    def _get_transformation_for_frame(self, frame: int) -> Tuple[float, float, float]:
         """Retrieve the coordinates for a specific frame"""
         if self.coordinates.ndim == 2:
             if frame >= len(self.coordinates):
@@ -32,7 +32,7 @@ class WorldTransformation(BaseModel):
         else:
             raise ValueError("Invalid transformation coordinates")
 
-    def set_coordinates(self, coordinates):
+    def _set_coordinates(self, coordinates):
         self.coordinates = convert_list_to_array(coordinates)
         
 class Location(WorldTransformation):
@@ -45,7 +45,7 @@ class Location(WorldTransformation):
                     "or a list/array of 3D coordinates for animation"
     )
 
-    def apply_to(self, obj, frame: int = 0):
+    def _apply_to(self, obj, frame: int = 0):
         """Apply location to the object, considering if it's static or animated"""
         if isinstance(self.coordinates, np.ndarray):
             # Static location
@@ -64,7 +64,7 @@ class Rotation(WorldTransformation):
     )
     
 
-    def apply_to(self, obj, frame: int = 0):
+    def _apply_to(self, obj, frame: int = 0):
         """Apply rotation to the object, considering if it's static or animated"""
         if isinstance(self.coordinates, np.ndarray):
             # Static rotation to rad
@@ -91,7 +91,7 @@ class Scale(WorldTransformation):
         description="Static scale (x, y, z) or a list/array of scales for animation"
     )
     
-    def apply_to(self, obj, frame: int = 0):
+    def _apply_to(self, obj, frame: int = 0):
         """Apply scale to the object, considering if it's static or animated"""
         if isinstance(self.coordinates, np.ndarray):
             # Static scale
@@ -126,11 +126,11 @@ class World(GGMolvisArtist):
         # TODO: Is it necessary to implement this method?
         pass
     
-    def apply_to(self, obj, frame: int = 0):
+    def _apply_to(self, obj, frame: int = 0):
         """Apply the world transformations to the object"""
-        self.location.apply_to(obj, frame)
-        self.rotation.apply_to(obj, frame)
-        self.scale.apply_to(obj, frame)
+        self.location._apply_to(obj, frame)
+        self.rotation._apply_to(obj, frame)
+        self.scale._apply_to(obj, frame)
 
     @property
     def matrix_world(self):

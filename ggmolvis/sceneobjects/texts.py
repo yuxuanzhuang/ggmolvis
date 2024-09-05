@@ -9,6 +9,3 @@ class Text(SceneObject):
 
     def _create_object(self):
         pass
-
-    def draw(self):
-        pass

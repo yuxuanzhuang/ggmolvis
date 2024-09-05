@@ -30,7 +30,12 @@ class Material(Property):
         self.property_name = material_name
         self._set_property(material_name)
 
-    def apply_to(self, obj, frame: int = 0):
+    def _apply_to(self, obj, frame: int = 0):
+        # TODO: apply material to the object
+        pass
+
+class MoleculeMaterial(Material):
+    def _apply_to(self, obj, frame: int = 0):
         """Apply material to the object."""
 
         set_material_mn(obj, self.material_name)

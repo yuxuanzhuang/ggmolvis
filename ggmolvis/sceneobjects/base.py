@@ -74,9 +74,9 @@ class SceneObject(GGMolvisArtist):
             camera_position=camera_center, target_position=center_xyz
         )
 
-        # self.camera.world.rotation.set_coordinates(rotation_camera)
+        # self.camera.world.rotation._set_coordinates(rotation_camera)
         self.camera.object.matrix_world = rotation_camera
-        self.camera.world.location.set_coordinates(camera_center)
+        self.camera.world.location._set_coordinates(camera_center)
 
     def _move_to_collection(self):
         """Move the object to the collection with the same name"""
@@ -92,9 +92,9 @@ class SceneObject(GGMolvisArtist):
 
     def _update_frame(self, frame):
         object = self.object
-        self.material.apply_to(object, frame)
-        self.color.apply_to(object, frame)
-        self.world.apply_to(object, frame)
+        self.material._apply_to(object, frame)
+        self.color._apply_to(object, frame)
+        self.world._apply_to(object, frame)
 
         camera = self.camera
         camera._update_frame(frame)
@@ -113,13 +113,11 @@ class SceneObject(GGMolvisArtist):
             "This method is only available in the subclass"
         )
 
-    @abstractmethod
     def draw(self):
         """Draw the object"""
-        # TODO: What should be done here?
-        raise NotImplementedError(
-            "This method is only available in the subclass"
-        )
+        self.style._apply_to(self.object)
+        self.color._apply_to(self.object)
+        self.material._apply_to(self.object)
 
     @property
     def object(self):
@@ -135,12 +133,15 @@ class SceneObject(GGMolvisArtist):
 
     def set_style(self, style):
         self.style.set_style(style)
+        self.style._apply_to(self.object)
 
     def set_material(self, material):
         self.material.set_material(material)
+        self.material._apply_to(self.object)
 
     def set_color(self, color):
         self.color.set_color(color)
+        self.color._apply_to(self.object)
 
     def render(self):
         self.camera.render()

@@ -1,6 +1,6 @@
 import bpy
 import molecularnodes as mn
-from molecularnodes.blender.nodes import swap, styles_mapping, assign_material
+from molecularnodes.blender.nodes import swap, assign_material, add_custom
 
 def extract_mn_node(object: bpy.types.Object):
     """Extract the node group from the MN object."""
@@ -31,6 +31,18 @@ def swap_style(object, style):
     style_lists = [s for s in nodes.keys()  if s.startswith("Style")]
     style_node = nodes[style_lists[0]]
     swap(style_node, style)
+    
+    # add DSSP node before that if cartoon style
+    # kinda hacky
+    if style == 'Style Cartoon':
+        nodes_mn = object.modifiers["MolecularNodes"].node_group
+        add_custom(nodes_mn, name='Topology DSSP')
+        dssp_node = nodes_mn.nodes['Topology DSSP']
+
+        # link dssp before style node
+        links.new(dssp_node.outputs["Atoms"], style_node.inputs["Atoms"])
+        # after Set Color
+        links.new(dssp_node.inputs["Atoms"], nodes['Set Color'].outputs["Atoms"])
 
 
 def set_material(object, material):

@@ -12,5 +12,5 @@ class Color(Property):
         self.property_name = color_name
         self._set_property()
 
-    def apply_to(self, obj, frame: int = 0):
+    def _apply_to(self, obj, frame: int = 0):
         pass

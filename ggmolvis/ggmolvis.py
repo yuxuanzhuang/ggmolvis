@@ -94,8 +94,8 @@ class GGMolVis(GGMolvisArtist):
 
         # pre-defined camera position
         bpy.data.collections.get('MolecularNodes').objects.link(self._global_camera.object)
-        self._global_camera.world.location.set_coordinates((0, -4, 1.3))
-        self._global_camera.world.rotation.set_coordinates((83, 0, 0))
+        self._global_camera.world.location._set_coordinates((0, -4, 1.3))
+        self._global_camera.world.rotation._set_coordinates((83, 0, 0))
 
         # set up the scene
         self._set_scene()
@@ -108,7 +108,7 @@ class GGMolVis(GGMolvisArtist):
         for artist in self._artists:
             artist._update_frame(frame_number)
 
-        self._global_camera.world.apply_to(self._global_camera.object, frame_number)
+        self._global_camera.world._apply_to(self._global_camera.object, frame_number)
 
     @property
     def _artists(self):

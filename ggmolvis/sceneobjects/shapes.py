@@ -80,9 +80,6 @@ class Line(Shape):
         self._update_frame(bpy.context.scene.frame_current)
         return self.line_object
 
-    def draw(self):
-        pass
-
     def _update_frame(self, frame):
         object = self.object
         start_point, end_point = self._get_points_for_frame(frame)
@@ -98,7 +95,7 @@ class Line(Shape):
             end_point[2],
             1.0,
         )
-        self.world.apply_to(object, frame)
+        self.world._apply_to(object, frame)
 
     def _get_points_for_frame(self, frame: int) -> Tuple[float, float, float]:
         """Retrieve the coordinates for a specific frame"""
@@ -111,7 +108,8 @@ class Line(Shape):
         # get the next frame
         frame_b = frame_a + 1
         if frame_b >= self.start_points.shape[0]:
-            return self.start_points[-1], self.end_points[-1]
+            return (self.start_points[-1] * self.world_scale,
+                    self.end_points[-1] * self.world_scale)
 
         locations_a = []
         locations_b = []

@@ -7,7 +7,7 @@ from typing import Union
 
 from .base import SceneObject
 from ..utils.node import set_selection
-from ..properties import Color, Material, MoleculeStyle
+from ..properties import Color, MoleculeMaterial, MoleculeStyle
 
 
 
@@ -21,7 +21,7 @@ class Molecule(SceneObject):
         rotation=None,
         scale=None,
         color="black",
-        material="MN Default",
+        material="default",
         style: str = "spheres",
     ):
         """Show the molecule."""
@@ -45,6 +45,9 @@ class Molecule(SceneObject):
     def _init_style(self, style="default"):
         self._style = MoleculeStyle(self, style)
 
+    def _init_material(self, material="default"):
+        self._material = MoleculeMaterial(self, material)
+
     def _create_object(self):
         traj = Trajectory(self.universe)
         self.trajectory = traj
@@ -58,9 +61,6 @@ class Molecule(SceneObject):
         set_selection(self.object, self.name)
         return self.object
     
-    def draw(self):
-        pass
-
     @property
     def object(self):
         return self.trajectory.object
