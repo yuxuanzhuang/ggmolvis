@@ -30,22 +30,43 @@ def convert_list_to_array(value):
     raise ValueError("Coordinates must be a NumPy array or a list of tuples/lists with shape (N, 3)")
 
 def look_at(camera_position, target_position):
-    # https://blender.stackexchange.com/questions/68834/recreate-to-track-quat-with-two-vectors-using-python
-    camera_direction = camera_position - target_position
-    camera_direction = camera_direction / np.linalg.norm(camera_direction)
-    camera_right = np.cross(np.array([0.0, 0.0, 1.0]), camera_direction)
-    camera_right = camera_right / np.linalg.norm(camera_right)
-    camera_up = np.cross(camera_direction, camera_right)
-    camera_up = camera_up / np.linalg.norm(camera_up)
-    rotation_transform = np.zeros((4, 4))
-    rotation_transform[0, :3] = camera_right
-    rotation_transform[1, :3] = camera_up
-    rotation_transform[2, :3] = camera_direction
-    rotation_transform[-1, -1] = 1
-    translation_transform = np.eye(4)
-    translation_transform[:3, -1] = - camera_position
-    look_at_transform = np.matmul(rotation_transform, translation_transform)
-    return look_at_transform
+    """
+    Calculate the rotation matrix for a camera to point towards a target position.
+
+    Parameters:
+    camera_position (mathutils.Vector): The current position of the camera.
+    target_position (mathutils.Vector): The position that the camera should look at.
+
+    Returns:
+    mathutils.Matrix: A 4x4 rotation matrix for the camera.
+    """
+    # Calculate the forward direction (from camera to target)
+    target_position = mathutils.Vector(target_position)
+    camera_position = mathutils.Vector(camera_position)
+    forward = (target_position - camera_position).normalized()
+
+    # Define the up vector (typically the global Z axis in Blender)
+    up = mathutils.Vector((0.0, 0.0, 1.0))
+
+    # Calculate the right vector (perpendicular to forward and up)
+    right = forward.cross(up).normalized()
+
+    # Recalculate the up vector to ensure it's orthogonal to the forward and right vectors
+    up = right.cross(forward).normalized()
+
+    # Create a 3x3 rotation matrix from the right, up, and forward vectors
+    rotation_matrix = mathutils.Matrix((
+        right,
+        up,
+        -forward  # Blender's camera looks along the -Z axis, so we negate the forward vector
+    )).transposed()  # Transpose because Blender expects column-major order
+
+    # Convert the 3x3 rotation matrix to a 4x4 matrix (no translation, just rotation)
+    rotation_matrix_4x4 = rotation_matrix.to_4x4()
+
+    _, rot, _ = rotation_matrix_4x4.decompose()
+
+    return rot
 
 def quaternion_to_euler(quaternion):
     """

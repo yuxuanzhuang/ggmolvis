@@ -8,12 +8,12 @@ from .base import GGMolvisArtist
 from .utils import convert_list_to_array, euler_to_quaternion
 
 class WorldTransformation(BaseModel):
-    coordinates: Union[Tuple[float, float, float], List[Tuple[float, float, float]]] = Field(
+    coordinates: Union[List[float], List[List[float]]] = Field(
         ...,
         description="Static transformation (x, y, z) or a list/array of transformations for animation"
     )
 
-    @field_validator('coordinates', mode='before')
+    @field_validator('coordinates')
     def _convert_lists_to_array(cls, value):
         return convert_list_to_array(value)
 
@@ -21,7 +21,7 @@ class WorldTransformation(BaseModel):
         raise NotImplementedError("This method must be implemented in the subclass")
     
 
-    def _get_transformation_for_frame(self, frame: int) -> Tuple[float, float, float]:
+    def _get_transformation_for_frame(self, frame: int) -> np.ndarray:
         """Retrieve the coordinates for a specific frame"""
         if self.coordinates.ndim == 2:
             if frame >= len(self.coordinates):
@@ -35,10 +35,10 @@ class WorldTransformation(BaseModel):
     def _set_coordinates(self, coordinates):
         self.coordinates = convert_list_to_array(coordinates)
         
+
 class Location(WorldTransformation):
     # The location can be either a static tuple or a list of tuples for animations
-    coordinates: Union[Tuple[float, float, float],
-                      List[Tuple[float, float, float]]] = Field(
+    coordinates: Union[List[float], List[List[float]]] = Field(
         ...,
     alias="location",
     description="Zero point of the object either 3D coordinates"
@@ -57,13 +57,12 @@ class Location(WorldTransformation):
 
 class Rotation(WorldTransformation):
     # The rotation can be either a static tuple or a list of tuples for animations
-    coordinates: Union[Tuple[float, float, float], List[Tuple[float, float, float]]] = Field(
+    coordinates: Union[List[float], List[List[float]]] = Field(
         ...,
         alias = "rotation",
         description="Static rotation (roll, pitch, yaw) or a list/array of rotations for animation"
     )
     
-
     def _apply_to(self, obj, frame: int = 0):
         """Apply rotation to the object, considering if it's static or animated"""
         if isinstance(self.coordinates, np.ndarray):
@@ -84,8 +83,8 @@ class Rotation(WorldTransformation):
 
 
 class Scale(WorldTransformation):
-    # The scale can be either a static tuple or a list of tuples for animations
-    coordinates: Union[Tuple[float, float, float], List[Tuple[float, float, float]]] = Field(
+    # The scale can be either a static list or a list of list for animations
+    coordinates: Union[List[float], List[List[float]]] = Field(
         ..., 
         alias="scale",
         description="Static scale (x, y, z) or a list/array of scales for animation"
@@ -102,25 +101,22 @@ class Scale(WorldTransformation):
 
 
 class World(GGMolvisArtist):
-    location: Location
-    rotation: Rotation
-    scale: Scale
-    
     def __init__(self,
                  location=None,
                  rotation=None,
                  scale=None):
         super().__init__()
         if location is None:
-            location = (0.0, 0.0, 0.0)
+            location = [0.0, 0.0, 0.0]
         if rotation is None:
-            rotation = (0.0, 0.0, 0.0)
+            rotation = [0.0, 0.0, 0.0]
         if scale is None:
-            scale = (1.0, 1.0, 1.0)
+            scale = [1.0, 1.0, 1.0]
+        
         self.location = Location(location=location)
         self.rotation = Rotation(rotation=rotation)
         self.scale = Scale(scale=scale)
-    
+
     def _update_frame(self, frame_number):
         """Not implemented in the World class"""
         # TODO: Is it necessary to implement this method?

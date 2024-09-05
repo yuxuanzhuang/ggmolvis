@@ -28,7 +28,7 @@ class SceneObject(GGMolvisArtist):
         rotation=None,
         scale=None,
         color="black",
-        material="Backdrop",
+        material="backdrop",
         style="default",
     ):
         self.world = World(location=location, rotation=rotation, scale=scale)
@@ -37,11 +37,17 @@ class SceneObject(GGMolvisArtist):
 
         self._subframes = 0
 
+        # Create the object
         obj = self._create_object()
+
+        # set the name that Blender assigned to the object
         self.name = obj.name
+
         self._init_color(color)
         self._init_material(material)
         self._init_style(style)
+
+        self.world._apply_to(self.object)
         self._init_camera()
         self._move_to_collection()
 
@@ -66,17 +72,20 @@ class SceneObject(GGMolvisArtist):
         for v in bbox:
             center_xyz += np.array(v)
         center_xyz /= 8
+
+        # shift by the location of the object
+        center_xyz += np.array(self.object.location)
+
         camera_center = center_xyz.copy()
         camera_center[1] = camera_center[1] - size_obj_xyz[1] * 3
         camera_center[2] = camera_center[2] + size_obj_xyz[2] * 1.3
 
-        rotation_camera = look_at(
+        rot = look_at(
             camera_position=camera_center, target_position=center_xyz
         )
 
-        # self.camera.world.rotation._set_coordinates(rotation_camera)
-        self.camera.object.matrix_world = rotation_camera
         self.camera.world.location._set_coordinates(camera_center)
+        self.camera.world.rotation._set_coordinates(np.rad2deg(list(rot.to_euler())))
 
     def _move_to_collection(self):
         """Move the object to the collection with the same name"""

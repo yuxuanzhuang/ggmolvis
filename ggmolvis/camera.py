@@ -45,7 +45,6 @@ class Camera(GGMolvisArtist):
         """Update the camera's state for the given frame"""
         self.world._apply_to(self.object, frame_number)
     
-    
     def set_view(self):
         """Set the current view to this camera"""
         bpy.context.scene.camera = self.object
