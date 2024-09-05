@@ -4,7 +4,7 @@ from PIL import Image
 from IPython.display import display
 
 class Renderer:
-    def __init__(self, resolution=(1920, 1080), filepath=None):
+    def __init__(self, resolution=(640, 360), filepath=None):
         # Set the render resolution
         bpy.context.scene.render.resolution_x = resolution[0]
         bpy.context.scene.render.resolution_y = resolution[1]
