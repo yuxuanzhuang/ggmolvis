@@ -102,7 +102,6 @@ class GGMolVis(GGMolvisArtist):
 
         self._update_frame(bpy.context.scene.frame_current)
 
-
     def _update_frame(self, frame_number):
         """Update the camera's state for the given frame"""
         for artist in self._artists:

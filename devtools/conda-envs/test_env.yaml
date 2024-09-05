@@ -21,5 +21,6 @@ dependencies:
   - pip:
     # get from github
     - git+https://github.com/BradyAJohnston/MolecularNodes.git@v4.2.5
+    - bpy
   #  - codecov
 

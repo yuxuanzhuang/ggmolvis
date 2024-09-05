@@ -101,7 +101,7 @@ class GGMolvisArtist(ABC):
     @abstractmethod
     def _update_frame(self, frame):
         """Abstract method to update the object's state for the given frame"""
-        pass
+        raise NotImplementedError("The method _update_frame must be implemented in the subclass")
 
     @property
     def ggmolvis(self):

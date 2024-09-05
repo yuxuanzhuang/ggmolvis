@@ -52,7 +52,7 @@ class Location(WorldTransformation):
             obj.location = self.coordinates
         elif isinstance(self.coordinates, list):
             # Animated location
-            obj.location = self.get_transformation_for_frame(frame)
+            obj.location = self._get_transformation_for_frame(frame)
         
 
 class Rotation(WorldTransformation):
@@ -71,7 +71,7 @@ class Rotation(WorldTransformation):
             obj.rotation_euler = np.radians(self.coordinates)
         elif isinstance(self.coordinates, list):
             # Animated rotation
-            obj.rotation_euler = self.get_transformation_for_frame(frame)
+            obj.rotation_euler = self._get_transformation_for_frame(frame)
     
     @property
     def quaternion(self):
@@ -98,7 +98,7 @@ class Scale(WorldTransformation):
             obj.scale = self.coordinates
         elif isinstance(self.coordinates, list):
             # Animated scale
-            obj.scale = self.get_transformation_for_frame(frame)
+            obj.scale = self._get_transformation_for_frame(frame)
 
 
 class World(GGMolvisArtist):
