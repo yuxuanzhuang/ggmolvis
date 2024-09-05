@@ -1,6 +1,7 @@
 # TODO list for the package
 
 **Implementation**
+- [ ] World transformation not working
 - [ ] better frame changing machinery
 - [ ] Material frame changing
 - [ ] Style frame changing
@@ -26,3 +27,5 @@
 
 **Testing**
 - [ ] add tests
+
+**Bug**

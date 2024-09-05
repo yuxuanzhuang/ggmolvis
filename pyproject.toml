@@ -21,6 +21,7 @@ dependencies = [
     "MDAnalysis>=2.7.0",
     "molecularnodes @ git+https://github.com/BradyAJohnston/MolecularNodes.git@v4.2.5",
     "pydantic",
+    "jupyter",
 ]
 keywords = [
     "molecular simulations",

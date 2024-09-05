@@ -7,6 +7,7 @@ dependencies:
   - python
   - pip
   - pydantic
+  - jupyter
 
   # MDAnalysis
   - MDAnalysis
