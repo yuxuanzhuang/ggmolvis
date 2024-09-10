@@ -113,9 +113,9 @@ class World(GGMolvisArtist):
         if scale is None:
             scale = [1.0, 1.0, 1.0]
         
-        self.location = Location(location=location)
-        self.rotation = Rotation(rotation=rotation)
-        self.scale = Scale(scale=scale)
+        self._location = Location(location=location)
+        self._rotation = Rotation(rotation=rotation)
+        self._scale = Scale(scale=scale)
 
     def _update_frame(self, frame_number):
         """Not implemented in the World class"""
@@ -139,3 +139,27 @@ class World(GGMolvisArtist):
         mat_world[:3, :3] = rot_mat.to_matrix()
         mat_world[:3, 3] = self.location.coordinates
         mat_world[-1, -1] = self.scale
+
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, value):
+        self._location._set_coordinates(value)
+
+    @property
+    def rotation(self):
+        return self._rotation
+    
+    @rotation.setter
+    def rotation(self, value):
+        self._rotation._set_coordinates(value)
+
+    @property
+    def scale(self):
+        return self._scale
+    
+    @scale.setter
+    def scale(self, value):
+        self._scale._set_coordinates(value)
