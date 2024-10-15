@@ -4,6 +4,8 @@ Molecular visualization with Blender
 """
 
 import os
+import shutil
+import tempfile
 from importlib.metadata import version
 import bpy
 from bpy.app.handlers import frame_change_post
@@ -25,7 +27,23 @@ mn_template_file = os.path.join(
         os.path.abspath(mn.utils.ADDON_DIR),
         "assets", "template", "startup.blend"
     )
-bpy.ops.wm.open_mainfile(filepath=mn_template_file)
+base_name = 'ggmolvis.blend'
+name, ext = os.path.splitext(base_name)
+dest_path = os.path.join('.', base_name)
+dest_dir = '.'
+if not os.access(dest_dir, os.W_OK):
+    print(f"Directory {dest_dir} is not writable. Using a temporary directory.")
+    dest_dir = tempfile.gettempdir()
+
+count = 1
+while os.path.exists(dest_path):
+    dest_path = os.path.join(dest_dir, f"{name}_{count}{ext}")
+    count += 1
+
+shutil.copy(mn_template_file, dest_path)
+
+
+bpy.ops.wm.open_mainfile(filepath=dest_path)
 
 
 @persistent
