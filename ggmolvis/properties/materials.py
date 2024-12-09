@@ -61,6 +61,15 @@ class Material(Property):
             "with the key as property name and value as the modifier.")
         self._material_modifier.update(value)
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state["material"]
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self._set_property()
+    
 
 class MoleculeMaterial(Material):
     def _apply_to(self, obj, frame: int = 0):

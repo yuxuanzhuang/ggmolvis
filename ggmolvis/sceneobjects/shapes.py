@@ -1,7 +1,7 @@
 import bpy
 from abc import ABC, abstractmethod
 
-from molecularnodes.utils import lerp
+from molecularnodes.bpyd.utils import lerp
 from molecularnodes.blender import coll
 import numpy as np
 from typing import Tuple, List, Union

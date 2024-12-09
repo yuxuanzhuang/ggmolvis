@@ -66,3 +66,5 @@ class Molecule(SceneObject):
     @property
     def object(self):
         return self.trajectory.object
+
+    
