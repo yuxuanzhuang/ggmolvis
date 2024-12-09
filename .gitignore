@@ -107,3 +107,8 @@ ENV/
 
 # poetry
 poetry.lock
+
+# examples
+examples/*.blend
+examples/*.mp4
+examples/*.png
