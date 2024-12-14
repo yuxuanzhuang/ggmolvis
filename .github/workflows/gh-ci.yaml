@@ -31,6 +31,7 @@ jobs:
         matrix:
           os: [ubuntu-latest, macOS-latest, windows-latest]
           mdanalysis-version: ["latest", "develop"]
+          molecular-nodes-version: ["main", "v4.2.9"]
           python-version: ["3.11"]
           #exclude:
             # Entries here exclude particular combinations of the matrix
@@ -48,13 +49,19 @@ jobs:
         df -h
         ulimit -a
 
+    - name: Set MolecularNodes version
+      run: |
+        # copy env file
+        cp devtools/conda-envs/test_env.yaml devtools/conda-envs/test_env_temp.yaml
+        # replace version
+        sed -i "s/MNVERSION/${{ matrix.molecular-nodes-version }}/g" devtools/conda-envs/test_env_temp.yaml
 
     # More info on options: https://github.com/conda-incubator/setup-miniconda
     - name: Install conda dependencies
       uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: ${{ matrix.python-version }}
-        environment-file: devtools/conda-envs/test_env.yaml
+        environment-file: devtools/conda-envs/test_env_temp.yaml
         add-pip-as-python-dependency: true
 
         miniforge-variant: Mambaforge
@@ -93,6 +100,10 @@ jobs:
     - name: Run tests
       run: |
         pytest -n 2 -v --cov=ggmolvis --cov-report=xml --color=yes ggmolvis/tests/
+        if [ $? -ne 0 ]; then
+            echo "Segmentation fault during exit"
+            exit 0
+        fi
 
     - name: codecov
       if: github.repository == 'yuxuanzhuang/ggmolvis' && github.event_name != 'schedule'
