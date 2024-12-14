@@ -26,7 +26,7 @@ ggmolvis
 
 It is inspired by the design patterns of ggplot2 and matplotlib. The goal is to create a stable Python API that enables users to visualize molecular trajectories (and potentially other entities in MN) with both automation and customization. Everything is designed to be dynamic during frame changes. The package also includes capabilities to visualize protein features and analysis results---such as distances, angles, and dihedrals---with texts, lines, and shapes.
 
-![example](./examples/rendering/example_ggmolvis.png)
+![example](./rendering/example_ggmolvis.png)
 
 ### Features (planned)
 
