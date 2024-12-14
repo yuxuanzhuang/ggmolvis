@@ -54,8 +54,9 @@ class Molecule(SceneObject):
         traj = Trajectory(self.universe)
         self.trajectory = traj
         self.trajectory.create_object(
-            name=self.name, style=self._style_name, subframes=self.subframes
+            name=self.name, style=self._style_name
         )
+        self.trajectory.subframes = self.subframes
         self.trajectory.add_selection_from_atomgroup(
             self.atomgroup, name=self.name
         )
