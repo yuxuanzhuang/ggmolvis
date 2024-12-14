@@ -22,7 +22,7 @@ def set_selection(object, selection_name):
     style_lists = [s for s in nodes.keys()  if s.startswith("Style")]
     style_node = nodes[style_lists[0]]
     links.new(named_attr_node.outputs["Attribute"],
-                    style_node.inputs["Selection"])
+              style_node.inputs["Selection"])
 
 
 def swap_style(object, style):
