@@ -54,7 +54,7 @@ jobs:
         # copy env file
         cp devtools/conda-envs/test_env.yaml devtools/conda-envs/test_env_temp.yaml
         # replace version
-        sed -i "s/MNVERSION/${{ matrix.molecular-nodes-version }}/g" devtools/conda-envs/test_env_temp.yaml
+        perl -pi -e "s/MNVERSION/${{ matrix.molecular-nodes-version }}/g" devtools/conda-envs/test_env_temp.yaml
 
     # More info on options: https://github.com/conda-incubator/setup-miniconda
     - name: Install conda dependencies
@@ -99,10 +99,17 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest -n 2 -v --cov=ggmolvis --cov-report=xml --color=yes ggmolvis/tests/
-        if [ $? -ne 0 ]; then
-            echo "Segmentation fault during exit"
+        # Run pytest in a subshell and capture its exit code
+        (pytest -n 2 -v --cov=ggmolvis --cov-report=xml --color=yes ggmolvis/tests/)
+        exit_code=$?
+
+        # Check exit code and handle segmentation fault
+        if [ $exit_code -eq 139 ]; then
+            echo "Segmentation fault occurred. Ignoring and continuing CI."
             exit 0
+        elif [ $exit_code -ne 0 ]; then
+            echo "Tests failed with exit code $exit_code."
+            exit $exit_code
         fi
 
     - name: codecov

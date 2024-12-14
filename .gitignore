@@ -112,3 +112,5 @@ poetry.lock
 examples/*.blend
 examples/*.mp4
 examples/*.png
+*.blend
+test_env_temp.yaml
