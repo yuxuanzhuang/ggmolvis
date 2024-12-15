@@ -6,7 +6,19 @@ build:
   os: ubuntu-22.04
   tools:
     python: "mambaforge-22.9"
-  commands:
-    - mamba env create --quiet --name latest --file docs/requirements.yaml
-    - /home/docs/checkouts/readthedocs.org/user_builds/ggmolvis/conda/env/latest/bin/python3 -m pip install --upgrade --upgrade-strategy only-if-needed --no-cache-dir .
-    - /home/docs/checkouts/readthedocs.org/user_builds/ggmolvis/conda/env/latest/bin/python3 -m sphinx -T -b html -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html || true
+
+conda:
+  file: docs/requirements.yaml
+
+python:
+  install:
+    - method: pip
+      path: .
+
+sphinx:
+  configuration: conf.py
+
+jobs:
+  post_build:
+    - python -m pip install --upgrade --upgrade-strategy only-if-needed --no-cache-dir .
+    - python -m sphinx -T -b html -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html || true
