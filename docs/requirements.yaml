@@ -9,5 +9,8 @@ dependencies:
   - pip
 
   - mdanalysis-sphinx-theme >=1.0.1
+  - jupyter_contrib_nbextensions
+  - nbsphinx
+  - pandoc
     # Pip-only installs
   #- pip:
