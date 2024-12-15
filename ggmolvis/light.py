@@ -10,4 +10,3 @@ from . import SESSION
 
 class Light(GGMolvisArtist):
     """Class for the light."""
-    pass

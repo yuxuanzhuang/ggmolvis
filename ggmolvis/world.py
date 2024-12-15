@@ -120,7 +120,6 @@ class World(GGMolvisArtist):
     def _update_frame(self, frame_number):
         """Not implemented in the World class"""
         # TODO: Is it necessary to implement this method?
-        pass
     
     def _apply_to(self, obj, frame: int = 0):
         """Apply the world transformations to the object"""
