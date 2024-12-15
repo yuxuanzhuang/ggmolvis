@@ -75,7 +75,7 @@ jobs:
       uses: MDAnalysis/install-mdanalysis@main
       with:
         version: ${{ matrix.mdanalysis-version }}
-        install-tests: false
+        install-tests: true
         installer:  mamba 
         shell: bash  -l {0} 
       
