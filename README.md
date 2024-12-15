@@ -28,74 +28,19 @@ It is inspired by the design patterns of ggplot2 and matplotlib. The goal is to 
 
 ![example](./rendering/example_ggmolvis.png)
 
-### Features (planned)
+### Features
 
-- Trajectory visualization in jupyter notebook.
-- Customizable feature visualization.
-- Analysis result visualization.
+- API Development: We will create a stable API for Molecular Nodes, empowering users to automate molecular rendering with minimal effort.
 
+- Interactive Jupyter Integration: A Jupyter widget will be built to integrate with MDAnalysis, providing an interactive environment for controlling and rendering molecular objects directly within notebooks via Blender.
+
+- Advanced Visualization Tools: We will develop tools for visualizing basic geometric features and even complex analysis results from MDAnalysis.
 
 ggmolvis is bound by a [Code of Conduct](https://github.com/yuxuanzhuang/ggmolvis/blob/main/CODE_OF_CONDUCT.md).
 
 ### Installation
 
-To build ggmolvis from source,
-we highly recommend using virtual environments.
-If possible, we strongly recommend that you use
-[Anaconda](https://docs.conda.io/en/latest/) as your package manager.
-Below we provide instructions both for `conda` and
-for `pip`.
-
-#### With conda
-
-Ensure that you have [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) installed.
-
-Create a virtual environment and activate it:
-
-```
-conda create --name ggmolvis
-conda activate ggmolvis
-```
-
-Install the development and documentation dependencies:
-
-```
-conda env update --name ggmolvis --file devtools/conda-envs/test_env.yaml
-conda env update --name ggmolvis --file docs/requirements.yaml
-```
-
-Build this package from source:
-
-```
-pip install -e .
-```
-
-If you want to update your dependencies (which can be risky!), run:
-
-```
-conda update --all
-```
-
-And when you are finished, you can exit the virtual environment with:
-
-```
-conda deactivate
-```
-
-#### With pip
-
-To build the package from source, run:
-
-```
-pip install .
-```
-
-If you want to create a development environment, install
-the dependencies required for tests and docs with:
-
-```
-pip install ".[test,doc]"
-```
+Follow the installation instructions in the [documentation](https://ggmolvis.readthedocs.io/en/latest/).
 
 ### Quickstart
 
