@@ -7,14 +7,6 @@ build:
   tools:
     python: "mambaforge-22.9"
   commands:
-   - python -m sphinx -T -b html -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html || true
-conda:
-  environment: docs/requirements.yaml
-
-python:
-  install:
-    - method: pip
-      path: .
-      
-sphinx:
-  configuration: docs/conf.py
+    - mamba env create --quiet --name latest --file docs/requirements.yaml
+    - python -m pip install --upgrade --upgrade-strategy only-if-needed --no-cache-dir .
+    - python -m sphinx -T -b html -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html || true
