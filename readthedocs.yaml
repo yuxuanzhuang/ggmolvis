@@ -8,15 +8,12 @@ build:
     python: "mambaforge-22.9"
 
 conda:
-  file: docs/requirements.yaml
+  environment: docs/requirements.yaml
 
 python:
   install:
     - method: pip
       path: .
-
-sphinx:
-  configuration: conf.py
 
 jobs:
   post_build:
