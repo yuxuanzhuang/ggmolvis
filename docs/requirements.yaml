@@ -1,16 +1,30 @@
 name: ggmolvis-docs
 channels:
-
   - conda-forge
-
+  - defaults
 dependencies:
-    # Base depends
-  - python
+  # Base depends
+  - python=3.11
   - pip
+  - pydantic
+  - jupyter
 
+  # MDAnalysis
+  - MDAnalysis
+
+  # Testing
+  - pytest
+  - pytest-cov
+  - pytest-xdist
+  - codecov
+
+  # Documentation
   - mdanalysis-sphinx-theme >=1.0.1
-  - jupyter_contrib_nbextensions
   - nbsphinx
   - pandoc
-    # Pip-only installs
-  #- pip:
+
+  # Pip-only installs
+  - pip:
+    # get from github
+    - git+https://github.com/BradyAJohnston/MolecularNodes.git@v4.2.9
+    - bpy
