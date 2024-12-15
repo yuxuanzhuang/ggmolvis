@@ -17,6 +17,7 @@ dependencies:
   - pytest-cov
   - pytest-xdist
   - codecov
+  - MDAnalysisTests
 
   # Pip-only installs
   - pip:
