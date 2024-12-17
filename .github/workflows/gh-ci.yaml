@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 defaults:
-  run:
+  run: 
     shell: bash -l {0}
 
 jobs:
@@ -64,7 +64,7 @@ jobs:
           version: ${{ matrix.mdanalysis-version }}
           install-tests: true
           installer: mamba
-        shell: bash -l {0}
+          shell: bash -l {0}
 
       - name: Install package
         run: |
@@ -176,7 +176,6 @@ jobs:
       - name: Install conda dependencies
         uses: conda-incubator/setup-miniconda@v3
         with:
-          # No matrix here, so just set a fixed python version or omit this line if environment defines it
           python-version: "3.11"
           environment-file: docs/requirements.yaml
           add-pip-as-python-dependency: true
