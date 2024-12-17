@@ -207,18 +207,30 @@ jobs:
 
       - name: Clone Pages Repo using SSH
         run: |
-
+          # Set folder name based on event type
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             export FOLDER_NAME="main"
           else
             export FOLDER_NAME="latest"
-          export VERSION=$(python -c "import ggmolvis; print(ggmolvis.__version__)" 2>/dev/null | head -n1)
-          echo "$VERSION"
-          BRANCH="${GITHUB_REF#refs/heads/}"
+          fi
 
+          # Get version and branch details
+          export VERSION=$(python -c "import ggmolvis; print(ggmolvis.__version__)" 2>/dev/null | head -n1 | awk '{print $1}')
+          echo "VERSION: $VERSION"
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          echo "Branch: $BRANCH"
+
+          # Move built docs into versioned folder
           cd docs/_build/html
-          mkdir ../${VERSION} && mv * ../${VERSION} && mv ../${VERSION} $VERSION
+          mkdir -p ../${VERSION}
+          mv * ../${VERSION}
+          mv ../${VERSION} $VERSION
+
+          # Get Git revision hash
           REV=$(git rev-parse --short HEAD)
+          echo "Git Revision: $REV"
+
+          # Initialize and configure Git
           git init
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
@@ -226,22 +238,27 @@ jobs:
           git fetch --depth 50 upstream gh-pages
           git reset upstream/gh-pages
 
-          # redirects and copies
-          mkdir ${FOLDER_NAME}
+          # Create redirects and copies
+          mkdir -p ${FOLDER_NAME}
           cp -r ${VERSION}/* ${FOLDER_NAME}/
-          touch .
           touch .nojekyll
           cp ../../../devtools/index.html .
 
+          # Add changes to Git
           git add -A ${VERSION}/
           git add -A ${FOLDER_NAME}/
           git add .nojekyll *.html index.html
 
-          for dirname in dev stable documentation_pages ; do
-             if [ -d $dirname ]; then git add $dirname; fi
+          # Add additional directories if they exist
+          for dirname in dev stable documentation_pages; do
+            if [ -d "$dirname" ]; then
+              git add "$dirname"
+            fi
           done
 
-          # check for anything to commit
-          # https://stackoverflow.com/questions/3878624/how-do-i-programmatically-determine-if-there-are-uncommited-changes
-          git diff-index --quiet HEAD -- || git commit -m "rebuilt html docs for version ${VERSION} from branch ${BRANCH} with sphinx at ${REV}"
+          # Check for uncommitted changes and commit
+          git diff-index --quiet HEAD -- || \
+            git commit -m "Rebuilt HTML docs for version ${VERSION} from branch ${BRANCH} with Sphinx at ${REV}"
+
+          # Push changes to upstream gh-pages branch
           git push -q upstream HEAD:gh-pages
