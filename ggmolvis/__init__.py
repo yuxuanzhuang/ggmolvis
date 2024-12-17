@@ -4,6 +4,7 @@ Molecular visualization with Blender
 """
 
 import os
+import time
 import shutil
 import tempfile
 from importlib.metadata import version
@@ -61,12 +62,20 @@ from .ggmolvis import GGMolVis
 GGMOLVIS = GGMolVis()
 
 import atexit
+
 def cleanup_function():
     print("Saving the current session to", dest_path)
-    bpy.ops.wm.save_as_mainfile(filepath=dest_path)
+#    bpy.ops.wm.save_as_mainfile(filepath=dest_path)
     from molecularnodes import unregister
-    frame_change_post.remove(update_frame)
-    unregister()
-
+#    frame_change_post.remove(update_frame)
+    try:
+        unregister()
+    except Exception as e:
+        print(e)
+        pass
+    # suppress segmenation fault
+#    time.sleep(1)
+#    bpy.ops.wm.quit_blender()
+#   import sys
 # Register the cleanup function
 atexit.register(cleanup_function)

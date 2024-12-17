@@ -127,7 +127,7 @@ jobs:
         fail_ci_if_error: true
 
 
-  pylint_check:
+pylint_check:
     if: "github.repository == 'yuxuanzhuang/ggmolvis'"
     runs-on: ubuntu-latest
 
@@ -152,7 +152,7 @@ jobs:
         pylint ggmolvis
 
 
-  pypi_check:
+pypi_check:
     if: "github.repository == 'yuxuanzhuang/ggmolvis'"
     runs-on: ubuntu-latest
 
@@ -178,3 +178,85 @@ jobs:
         test -n "${DISTRIBUTION}" || { echo "no distribution dist/ggmolvis-*.tar.gz found"; exit 1; }
         echo "twine check $DISTRIBUTION"
         twine check $DISTRIBUTION
+
+# Build the documentation on github.io website
+# Borrowed from MDAnalysis
+ build_docs:
+    if: "github.repository == 'yuxuanzhuang/ggmolvis'"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CYTHON_TRACE_NOGIL: 1
+      MPLBACKEND: agg
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: setup_micromamba
+      uses: mamba-org/setup-micromamba@v2
+      with:
+        environment-name: mda
+        create-args: >-
+          python=3.11
+          pip
+        condarc: |
+          channels:
+            - conda-forge
+            - bioconda
+
+    - name: Install conda dependencies
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+        environment-file: docs/requirements.yaml
+        add-pip-as-python-dependency: true
+        miniforge-variant: Miniforge3
+        use-mamba: true
+        channels: conda-forge, defaults
+        activate-environment: ggmolvis-test
+        auto-update-conda: true
+        auto-activate-base: false
+        show-channel-urls: true
+    
+
+    - name: Install package
+      run: |
+        python --version
+        python -m pip install .  --no-deps 
+
+    - name: Python information
+      run: |
+        which python
+        which pip
+        pip list
+
+        conda info
+        conda list
+
+    - name: build docs with sphinx
+      if: github.event_name == 'pull_request'
+      continue-on-error: true
+      run: |
+        # mark as true becasue segfaults with bpy.
+        sphinx-build --keep-going ./docs/source ./docs/_build/html || true
+
+      # Set up SSH agent and deploy key
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ secrets.DEPLOY_KEY_PRIVATE }}
+
+    - name: Clone Pages Repo using SSH
+      run: |
+        git clone git@github.com:yuxuanzhuang/ggmolvis.github.io.git pages
+        rm -rf pages/*
+        cp -r docs/_build/html/* pages/
+
+    - name: Commit and Push
+      run: |
+        cd pages
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add .
+        git commit -m "Update docs [skip ci]" || echo "No changes to commit"
+        git push origin main

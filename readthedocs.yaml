@@ -15,7 +15,6 @@ python:
     - method: pip
       path: .
 
-jobs:
-  post_build:
-    - python -m pip install --upgrade --upgrade-strategy only-if-needed --no-cache-dir .
+build:
+  commands:
     - python -m sphinx -T -b html -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html || true
