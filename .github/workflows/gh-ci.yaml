@@ -50,9 +50,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           environment-file: devtools/conda-envs/test_env_temp.yaml
           add-pip-as-python-dependency: true
-          
-          architecture: x64
-          miniforge-variant: Mambaforge
+          miniforge-variant: Miniforge3
           use-mamba: true
           channels: conda-forge, defaults
           activate-environment: ggmolvis-test
