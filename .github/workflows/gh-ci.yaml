@@ -207,8 +207,7 @@ jobs:
 
       - name: Clone Pages Repo using SSH
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
+
           export VERSION=v0.1.0
           BRANCH="${GITHUB_REF#refs/heads/}"
 
@@ -216,6 +215,8 @@ jobs:
           mkdir ../${VERSION} && mv * ../${VERSION} && mv ../${VERSION} $VERSION
           REV=$(git rev-parse --short HEAD)
           git init
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
           git remote add upstream "git@github.com:yuxuanzhuang/ggmolvis.github.io.git"
           git fetch --depth 50 upstream gh-pages
           git reset upstream/gh-pages
