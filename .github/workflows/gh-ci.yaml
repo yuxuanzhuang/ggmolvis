@@ -7,181 +7,150 @@ on:
     branches:
       - main
   schedule:
-    # Weekly tests at midnight on Sundays run on main by default:
-    #   Scheduled workflows run on the latest commit on the default or base branch.
-    #   (from https://help.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events-schedule)
+    # Weekly tests at midnight on Sundays:
     - cron: "0 0 * * 0"
 
 concurrency:
-  # Specific group naming so CI is only cancelled
-  # within same PR or on merge to main
   group: ${{ github.ref }}-${{ github.head_ref }}-${{ github.workflow }}
   cancel-in-progress: true
 
 defaults:
   run:
-    shell: bash  -l {0} 
+    shell: bash -l {0}
 
 jobs:
   main-tests:
     if: "github.repository == 'yuxuanzhuang/ggmolvis'"
     runs-on: ${{ matrix.os }}
     strategy:
-        fail-fast: false
-        matrix:
-          os: [ubuntu-latest, macOS-latest, windows-latest]
-          mdanalysis-version: ["latest", "develop"]
-          molecular-nodes-version: ["main", "v4.2.9"]
-          python-version: ["3.11"]
-          #exclude:
-            # Entries here exclude particular combinations of the matrix
-            # Edit or remove as particular combinations come into or out of date
-            # Below we exclude runs with the latest release and Python 3.12
-            #- mdanalysis-version: "latest"
-            #  python-version: "3.12"
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        mdanalysis-version: ["latest", "develop"]
+        molecular-nodes-version: ["main", "v4.2.9"]
+        python-version: ["3.11"]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Build information
-      run: |
-        uname -a
-        df -h
-        ulimit -a
+      - name: Build information
+        run: |
+          uname -a
+          df -h
+          ulimit -a
 
-    - name: Set MolecularNodes version
-      run: |
-        # copy env file
-        cp devtools/conda-envs/test_env.yaml devtools/conda-envs/test_env_temp.yaml
-        # replace version
-        perl -pi -e "s/v4.2.9/${{ matrix.molecular-nodes-version }}/g" devtools/conda-envs/test_env_temp.yaml
+      - name: Set MolecularNodes version
+        run: |
+          cp devtools/conda-envs/test_env.yaml devtools/conda-envs/test_env_temp.yaml
+          perl -pi -e "s/v4.2.9/${{ matrix.molecular-nodes-version }}/g" devtools/conda-envs/test_env_temp.yaml
 
-    # More info on options: https://github.com/conda-incubator/setup-miniconda
-    - name: Install conda dependencies
-      uses: conda-incubator/setup-miniconda@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-        environment-file: devtools/conda-envs/test_env_temp.yaml
-        add-pip-as-python-dependency: true
-        miniforge-variant: Miniforge3
-        use-mamba: true
-        channels: conda-forge, defaults
-        activate-environment: ggmolvis-test
-        auto-update-conda: true
-        auto-activate-base: false
-        show-channel-urls: true
+      - name: Install conda dependencies
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          environment-file: devtools/conda-envs/test_env_temp.yaml
+          add-pip-as-python-dependency: true
+          miniforge-variant: Miniforge3
+          use-mamba: true
+          channels: conda-forge, defaults
+          activate-environment: ggmolvis-test
+          auto-update-conda: true
+          auto-activate-base: false
+          show-channel-urls: true
 
-    - name: Install MDAnalysis version
-      uses: MDAnalysis/install-mdanalysis@main
-      with:
-        version: ${{ matrix.mdanalysis-version }}
-        install-tests: true
-        installer:  mamba 
-        shell: bash  -l {0} 
-      
-    - name: Install package
-      run: |
-        python --version
-        python -m pip install .  --no-deps 
+      - name: Install MDAnalysis version
+        uses: MDAnalysis/install-mdanalysis@main
+        with:
+          version: ${{ matrix.mdanalysis-version }}
+          install-tests: true
+          installer: mamba
+        shell: bash -l {0}
 
-    - name: Python information
-      run: |
-        which python
-        which pip
-        pip list
+      - name: Install package
+        run: |
+          python --version
+          python -m pip install . --no-deps
 
-        conda info
-        conda list
+      - name: Python information
+        run: |
+          which python
+          which pip
+          pip list
+          conda info
+          conda list
 
+      - name: Run tests
+        run: |
+          pytest -n 2 -v --cov=ggmolvis --cov-report=xml --color=yes ggmolvis/tests/ || true
+          exit_code=$?
+          if [ $exit_code -eq 139 ]; then
+              echo "Segmentation fault occurred. Ignoring and continuing CI."
+              exit 0
+          elif [ $exit_code -ne 0 ]; then
+              echo "Tests failed with exit code $exit_code."
+              exit $exit_code
+          fi
 
-    - name: Run tests
-      run: |
-        # Run pytest in a subshell and capture its exit code
-        pytest -n 2 -v --cov=ggmolvis --cov-report=xml --color=yes ggmolvis/tests/ || true
-        exit_code=$?
+      - name: codecov
+        if: github.repository == 'yuxuanzhuang/ggmolvis' && github.event_name != 'schedule'
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+          name: codecov-${{ matrix.os }}-py${{ matrix.python-version }}
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
 
-        # Handle segmentation fault (exit code 139)
-        if [ $exit_code -eq 139 ]; then
-            echo "Segmentation fault occurred. Ignoring and continuing CI."
-            exit 0
-        elif [ $exit_code -ne 0 ]; then
-            echo "Tests failed with exit code $exit_code."
-            exit $exit_code
-        fi
-
-    - name: codecov
-      if: github.repository == 'yuxuanzhuang/ggmolvis' && github.event_name != 'schedule'
-      uses: codecov/codecov-action@v4
-      with:
-        file: coverage.xml
-        name: codecov-${{ matrix.os }}-py${{ matrix.python-version }}
-        verbose: True
-        # to upload coverage reports, set a secret called CODECOV_TOKEN
-        # in the repository settings
-        # (Obtain this from the Codecov website after setting up the repository there)
-        token: ${{ secrets.CODECOV_TOKEN }}
-        # To fail the CI if there's an error, keep this set to true
-        # If repository forks need to run CI, you may need to set this to false
-        # Forks can't access the CODECOV_TOKEN secret,
-        # and a failed upload registers as an error
-        fail_ci_if_error: true
-
-
-pylint_check:
+  pylint_check:
     if: "github.repository == 'yuxuanzhuang/ggmolvis'"
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-    - name: Install Pylint
-      run: |
-        which pip
-        which python
-        pip install pylint mdanalysis
+      - name: Install Pylint
+        run: |
+          which pip
+          which python
+          pip install pylint mdanalysis
 
-    - name: Run Pylint
-      env:
-        PYLINTRC: .pylintrc
-      run: |
-        pylint ggmolvis
+      - name: Run Pylint
+        env:
+          PYLINTRC: .pylintrc
+        run: |
+          pylint ggmolvis
 
-
-pypi_check:
+  pypi_check:
     if: "github.repository == 'yuxuanzhuang/ggmolvis'"
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-    - name: Install dependencies
-      run: |
-        pip install pipx twine
+      - name: Install dependencies
+        run: |
+          pip install pipx twine
 
-    - name: Build package
-      run: |
-        python -m pipx run build --sdist
+      - name: Build package
+        run: |
+          python -m pipx run build --sdist
 
-    - name: Check package build
-      run: |
-        DISTRIBUTION=$(ls -t1 dist/ggmolvis-*.tar.gz | head -n 1)
-        test -n "${DISTRIBUTION}" || { echo "no distribution dist/ggmolvis-*.tar.gz found"; exit 1; }
-        echo "twine check $DISTRIBUTION"
-        twine check $DISTRIBUTION
+      - name: Check package build
+        run: |
+          DISTRIBUTION=$(ls -t1 dist/ggmolvis-*.tar.gz | head -n 1)
+          test -n "${DISTRIBUTION}" || { echo "no distribution dist/ggmolvis-*.tar.gz found"; exit 1; }
+          echo "twine check $DISTRIBUTION"
+          twine check $DISTRIBUTION
 
-# Build the documentation on github.io website
-# Borrowed from MDAnalysis
- build_docs:
+  build_docs:
     if: "github.repository == 'yuxuanzhuang/ggmolvis'"
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -190,73 +159,70 @@ pypi_check:
       MPLBACKEND: agg
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: setup_micromamba
-      uses: mamba-org/setup-micromamba@v2
-      with:
-        environment-name: mda
-        create-args: >-
-          python=3.11
-          pip
-        condarc: |
-          channels:
-            - conda-forge
-            - bioconda
+      - name: setup_micromamba
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-name: mda
+          create-args: >-
+            python=3.11
+            pip
+          condarc: |
+            channels:
+              - conda-forge
+              - bioconda
 
-    - name: Install conda dependencies
-      uses: conda-incubator/setup-miniconda@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-        environment-file: docs/requirements.yaml
-        add-pip-as-python-dependency: true
-        miniforge-variant: Miniforge3
-        use-mamba: true
-        channels: conda-forge, defaults
-        activate-environment: ggmolvis-test
-        auto-update-conda: true
-        auto-activate-base: false
-        show-channel-urls: true
-    
+      - name: Install conda dependencies
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          # No matrix here, so just set a fixed python version or omit this line if environment defines it
+          python-version: "3.11"
+          environment-file: docs/requirements.yaml
+          add-pip-as-python-dependency: true
+          miniforge-variant: Miniforge3
+          use-mamba: true
+          channels: conda-forge, defaults
+          activate-environment: ggmolvis-test
+          auto-update-conda: true
+          auto-activate-base: false
+          show-channel-urls: true
 
-    - name: Install package
-      run: |
-        python --version
-        python -m pip install .  --no-deps 
+      - name: Install package
+        run: |
+          python --version
+          python -m pip install . --no-deps
 
-    - name: Python information
-      run: |
-        which python
-        which pip
-        pip list
+      - name: Python information
+        run: |
+          which python
+          which pip
+          pip list
+          conda info
+          conda list
 
-        conda info
-        conda list
+      - name: build docs with sphinx
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          sphinx-build --keep-going ./docs/source ./docs/_build/html || true
 
-    - name: build docs with sphinx
-      if: github.event_name == 'pull_request'
-      continue-on-error: true
-      run: |
-        # mark as true becasue segfaults with bpy.
-        sphinx-build --keep-going ./docs/source ./docs/_build/html || true
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY_PRIVATE }}
 
-      # Set up SSH agent and deploy key
-    - name: Setup SSH
-      uses: webfactory/ssh-agent@v0.5.4
-      with:
-        ssh-private-key: ${{ secrets.DEPLOY_KEY_PRIVATE }}
+      - name: Clone Pages Repo using SSH
+        run: |
+          git clone git@github.com:yuxuanzhuang/ggmolvis.github.io.git pages
+          rm -rf pages/*
+          cp -r docs/_build/html/* pages/
 
-    - name: Clone Pages Repo using SSH
-      run: |
-        git clone git@github.com:yuxuanzhuang/ggmolvis.github.io.git pages
-        rm -rf pages/*
-        cp -r docs/_build/html/* pages/
-
-    - name: Commit and Push
-      run: |
-        cd pages
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git add .
-        git commit -m "Update docs [skip ci]" || echo "No changes to commit"
-        git push origin main
+      - name: Commit and Push
+        run: |
+          cd pages
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Update docs [skip ci]" || echo "No changes to commit"
+          git push origin main
