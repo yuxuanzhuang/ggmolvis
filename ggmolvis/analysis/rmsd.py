@@ -1,5 +1,4 @@
 from .base import Visualizer
-from ..sceneobjects import Molecule
 from ..ggmolvis import GGMolVis
 
 class RMSDVisualizer(Visualizer):

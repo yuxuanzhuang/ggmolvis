@@ -4,7 +4,6 @@ Molecular visualization with Blender
 """
 
 import os
-import time
 import shutil
 import tempfile
 from importlib.metadata import version
@@ -13,6 +12,7 @@ from bpy.app.handlers import frame_change_post
 from bpy.app.handlers import persistent
 import molecularnodes as mn
 from ggmolvis.utils import suppress_blender_output
+import atexit
 
 from loguru import logger
 
@@ -54,7 +54,7 @@ shutil.copy(mn_template_file, dest_path)
 with suppress_blender_output():
     bpy.ops.wm.open_mainfile(filepath=dest_path)
 
-
+# update every artist when the frame changes
 @persistent
 def update_frame(scene):
     for artist in SESSION._ggmolvis:
@@ -62,15 +62,13 @@ def update_frame(scene):
 
 frame_change_post.append(update_frame)
 
-# add visualize function to AnalysisBase
-from .analysis import Visualizer
+# add visualize function to AnalysisBase and GroupBase so that
+# AtomGroup and ResidueGroup can be visualized with `.visualize()`
+from ggmolvis.analysis import Visualizer
 
 from .ggmolvis import GGMolVis
 GGMOLVIS = GGMolVis()
 
-import atexit
-
-@suppress_blender_output()
 def cleanup_function():
 #    print("Saving the current session to", dest_path)
 #    bpy.ops.wm.save_as_mainfile(filepath=dest_path)
