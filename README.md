@@ -51,6 +51,8 @@ from MDAnalysis.analysis.rms import RMSD
 
 from ggmolvis.ggmolvis import GGMolVis
 
+ggmv = GGMolVis()
+
 u = mda.Universe(PSF, DCD)
 
 # Trajectory visualization

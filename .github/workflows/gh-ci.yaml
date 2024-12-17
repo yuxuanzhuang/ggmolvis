@@ -224,7 +224,7 @@ jobs:
           touch .nojekyll
 
           git add -A ${VERSION}/
-          git add .nojekyll versions.json *.xml *.html index.html latest
+          git add .nojekyll *.xml *.html index.html latest
 
           for dirname in dev stable documentation_pages ; do
              if [ -d $dirname ]; then git add $dirname; fi
