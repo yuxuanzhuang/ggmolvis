@@ -1,3 +1,12 @@
+"""
+This module contains the Camera class, which is used to represent the camera in the scene.
+
+Classes
+=======
+.. autoclass:: Camera
+    :members:
+    
+"""
 import bpy
 import molecularnodes as mn
 from molecularnodes.blender import coll

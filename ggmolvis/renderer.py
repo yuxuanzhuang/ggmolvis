@@ -1,3 +1,22 @@
+"""
+This module provides a simple renderer class that can be used to render images and movies in Blender.
+
+The `Renderer` class provides a simple interface to render images in Blender.
+It allows you to set the resolution of the render and the output file path.
+You can then call the `render` method to render the image and the
+`display_in_notebook` method to display the rendered image in a Jupyter notebook.
+
+Normally, you can use `.render()` function of the `Sceneobject` to render the scene instead of using this class.
+
+Classes
+=======
+
+.. autoclass:: Renderer
+    :members:
+
+.. autoclass:: MovieRenderer
+    :members:
+"""
 import bpy
 import tempfile
 from PIL import Image

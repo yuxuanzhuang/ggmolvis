@@ -1,3 +1,13 @@
+"""
+This module contains the base classes for the scene objects.
+
+Classes
+=======
+.. autoclass:: SceneObject
+    :members:
+.. autoclass:: SceneObjectCollection
+    :members:
+"""
 import bpy
 from abc import abstractmethod
 

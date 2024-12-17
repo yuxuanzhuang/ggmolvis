@@ -1,3 +1,13 @@
+"""
+This module contains the classes for the different shapes that can be created in the scene.
+
+Classes
+=======
+.. autoclass:: Shape
+    :members:
+.. autoclass:: Line
+    :members:
+"""
 import bpy
 from abc import ABC, abstractmethod
 

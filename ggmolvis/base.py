@@ -1,3 +1,12 @@
+"""
+Base classes for all visualizations in GGMolVis.
+
+Classes
+=======
+
+..autoclass:: GGMolvisArtist
+    :members:
+"""
 import bpy
 from abc import ABC, abstractmethod
 import molecularnodes as mn

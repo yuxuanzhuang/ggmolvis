@@ -1,3 +1,20 @@
+"""
+World is the class that represents the world transformations of an object.
+It contains the location, rotation, and scale of the object.
+
+Classes
+=======
+.. autoclass:: WorldTransformation
+    :members:
+.. autoclass:: Location
+    :members:
+.. autoclass:: Rotation
+    :members:
+.. autoclass:: Scale
+    :members:
+.. autoclass:: World
+    :members:
+"""
 import bpy
 import molecularnodes as mn
 import numpy as np
