@@ -8,9 +8,10 @@ dependencies:
   - pip
   - pydantic
   - jupyter
+  - loguru
 
   # MDAnalysis
-  - MDAnalysis
+  - MDAnalysis>=2.8.0
 
   # Testing
   - pytest

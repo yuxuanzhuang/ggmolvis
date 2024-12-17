@@ -14,9 +14,7 @@ python:
   install:
     - method: pip
       path: .
-      
-sphinx:
-  configuration: docs/conf.py
 
-commands:
-  - python -m sphinx -T -b html -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html || true
+build:
+  commands:
+    - python -m sphinx -T -b html -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html || true

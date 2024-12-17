@@ -18,10 +18,11 @@ maintainers = [
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "MDAnalysis>=2.7.0",
+    "MDAnalysis>=2.8.0",
     "molecularnodes @ git+https://github.com/BradyAJohnston/MolecularNodes.git@v4.2.9",
     "pydantic",
     "jupyter",
+    "loguru",
     "bpy"
 ]
 keywords = [

@@ -190,5 +190,3 @@ class SceneObject(GGMolvisArtist):
 class SceneObjectCollection:
     """Class for the collection of scene objects"""
     #TODO: Implement the class
-    pass
-    
