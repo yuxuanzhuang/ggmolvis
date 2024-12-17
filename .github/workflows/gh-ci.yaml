@@ -215,7 +215,7 @@ jobs:
           fi
 
           # Get version and branch details
-          python devtools/write_version.py
+          python devtools/write_version.py || true
           export VERSION=$(cat VERSION.txt)
           echo "VERSION: $VERSION"
           BRANCH="${GITHUB_REF#refs/heads/}"
