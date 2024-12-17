@@ -11,23 +11,27 @@ from .world import World, Location, Rotation
 from . import SESSION
 from .renderer import Renderer, MovieRenderer
 
+
 class Camera(GGMolvisArtist):
     """Class for the camera."""
-    def __init__(self,
-                 name=None,
-                 location=None,
-                 rotation=None,
-                 lens=24.0,
-                 clip_start=0.1,
-                 clip_end=1000.0):
+
+    def __init__(
+        self,
+        name=None,
+        location=None,
+        rotation=None,
+        lens=24.0,
+        clip_start=0.1,
+        clip_end=1000.0,
+    ):
         super().__init__()
-        
+
         # Initialize the location, rotation, and camera-specific properties
         self.world = World(location=location, rotation=rotation)
         self.lens = lens
         self.clip_start = clip_start
         self.clip_end = clip_end
-        
+
         self.camera = bpy.data.cameras.new(name if name else "Camera")
         camera_obj = bpy.data.objects.new(self.camera.name, self.camera)
         self.name = camera_obj.name
@@ -36,15 +40,15 @@ class Camera(GGMolvisArtist):
         self.camera.clip_end = self.clip_end
 
         self.set_view()
-        
+
     @property
     def object(self):
         return bpy.data.objects[self.name]
-    
+
     def _update_frame(self, frame_number):
         """Update the camera's state for the given frame"""
         self.world._apply_to(self.object, frame_number)
-    
+
     def set_view(self):
         """Set the current view to this camera"""
         bpy.context.scene.camera = self.object
@@ -53,7 +57,7 @@ class Camera(GGMolvisArtist):
         """Set the position of the camera"""
         self.world.location = location
         self.world.rotation = rotation
-    
+
     def _move_to_collection(self, name):
         """Move the object to the collection with the same name"""
         coll_obj = coll.mn().children.get(name)
@@ -61,29 +65,42 @@ class Camera(GGMolvisArtist):
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        del state['camera']
+        del state["camera"]
         return state
-    
+
     def __setstate__(self, state):
         self.__dict__.update(state)
-        self.camera = bpy.data.cameras[state['name']]
+        self.camera = bpy.data.cameras[state["name"]]
         self._set_property()
 
-    def render(self,
-               mode='image',
-               frame=None,
-               filepath=None,
-               resolution=(640, 360)):
+    def render(
+        self,
+        mode="image",
+        frame=None,
+        filepath=None,
+        resolution=(640, 360),
+        samples: int = 64,
+        engine="CYCLES",
+        format="PNG",
+    ):
         """Render the scene with this camera"""
         bpy.context.scene.camera = self.object
         if frame is not None:
             bpy.context.scene.frame_set(frame)
 
-        if mode == 'image':        
-            renderer = Renderer(resolution=resolution,
-                                filepath=filepath)
-        elif mode == 'movie':
-            renderer = MovieRenderer(resolution=resolution,
-                            filepath=filepath)
+        if mode == "image":
+            renderer = Renderer(
+                resolution=resolution,
+                filepath=filepath,
+                engine=engine,
+                format=format,
+                samples=samples,
+            )
+        elif mode == "movie":
+            renderer = MovieRenderer(
+                resolution=resolution, filepath=filepath, engine=engine, samples=samples
+            )
+        else:
+            raise ValueError(f"Invalid mode: {mode}")
         renderer.render()
         renderer.display_in_notebook()
