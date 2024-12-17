@@ -215,7 +215,8 @@ jobs:
           fi
 
           # Get version and branch details
-          export VERSION=$(python -c "import ggmolvis; print(ggmolvis.__version__)" 2>/dev/null | head -n1 | awk '{print $1}')
+          python devtools/write_version.py
+          export VERSION=$(cat VERSION.txt)
           echo "VERSION: $VERSION"
           BRANCH="${GITHUB_REF#refs/heads/}"
           echo "Branch: $BRANCH"
