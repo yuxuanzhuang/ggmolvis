@@ -207,8 +207,7 @@ jobs:
 
       - name: Clone Pages Repo using SSH
         run: |
-          export VERSION=$(python -c 'import ggmolvis; print(ggmolvis.__version__)')
-          UPDATE_JSON=$(pwd)/maintainer/update_json_stubs_sitemap.py
+          export VERSION=v0.1.0
           BRANCH="${GITHUB_REF#refs/heads/}"
 
           cd docs/_build/html
@@ -221,7 +220,6 @@ jobs:
 
           # redirects and copies
           mkdir latest
-          python $UPDATE_JSON
           touch .
           touch .nojekyll
 
