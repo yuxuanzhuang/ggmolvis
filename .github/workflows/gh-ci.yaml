@@ -161,17 +161,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: setup_micromamba
-        uses: mamba-org/setup-micromamba@v2
-        with:
-          environment-name: mda
-          create-args: >-
-            python=3.11
-            pip
-          condarc: |
-            channels:
-              - conda-forge
-              - bioconda
+      - name: Build information
+        run: |
+          uname -a
+          df -h
+          ulimit -a
 
       - name: Install conda dependencies
         uses: conda-incubator/setup-miniconda@v3
