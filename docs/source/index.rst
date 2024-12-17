@@ -3,12 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ggmolvis's documentation!
-=========================================================
+Customizable and Automated Scientific Molecular Rendering with Molecular Nodes
+==============================================================================
 
 As molecular simulations and other molecular entities continue to grow in scale and complexity, 
 there is an increasing demand for flexible, high-quality visualization tools capable of handling 
-these complex datasets efficiently. Molecular Nodes (About – Molecular Nodes ) enables quick import 
+these complex datasets efficiently. Molecular Nodes enables quick import 
 and visualization of structural biology data inside of Blender, a free and open-source 3D computer 
 graphics software tool. Blender has proven to be an innovative platform, providing versatile and 
 industry-quality renderings of static molecules, molecular dynamics (MD) simulations (with the support 
