@@ -225,6 +225,7 @@ jobs:
           mkdir latest
           touch .
           touch .nojekyll
+          cp ../../../devtools/index.html .
 
           git add -A ${VERSION}/
           git add .nojekyll *.html index.html latest
