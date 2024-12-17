@@ -12,6 +12,9 @@ import bpy
 from bpy.app.handlers import frame_change_post
 from bpy.app.handlers import persistent
 import molecularnodes as mn
+from ggmolvis.utils import suppress_blender_output
+
+from loguru import logger
 
 __version__ = version("ggmolvis")
 
@@ -44,9 +47,13 @@ base_name = 'ggmolvis.blend'
 # we will save the current session to the temporary directory
 dest_dir = tempfile.gettempdir()
 dest_path = os.path.join(dest_dir, base_name)
+logger.debug(f"Blend file stored at {dest_path}")
 
 shutil.copy(mn_template_file, dest_path)
-bpy.ops.wm.open_mainfile(filepath=dest_path)
+
+with suppress_blender_output():
+    bpy.ops.wm.open_mainfile(filepath=dest_path)
+
 
 @persistent
 def update_frame(scene):
@@ -63,6 +70,7 @@ GGMOLVIS = GGMolVis()
 
 import atexit
 
+@suppress_blender_output()
 def cleanup_function():
 #    print("Saving the current session to", dest_path)
 #    bpy.ops.wm.save_as_mainfile(filepath=dest_path)

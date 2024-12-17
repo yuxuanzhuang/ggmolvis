@@ -19,6 +19,8 @@ from .properties import Color, Material
 from .sceneobjects import SceneObject, Text, Molecule, Shape, Line
 from .utils import validate_properties
 
+from loguru import logger
+
 
 class GGMolVis(GGMolvisArtist):
     """Top level class that contains all the elements of the visualization.
@@ -65,7 +67,7 @@ class GGMolVis(GGMolvisArtist):
         if hasattr(SESSION, 'ggmolvis'):
             # If SESSION already has an instance, return that instance
             return SESSION.ggmolvis
-        print("Creating new GGMolVis")
+        logger.debug("Creating new GGMolVis")
         # Otherwise, create a new instance
         instance = super().__new__(cls)
         SESSION.ggmolvis = instance  # Store the instance in SESSION

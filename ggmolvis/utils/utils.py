@@ -4,6 +4,9 @@ from functools import wraps
 import bpy
 import mathutils
 from molecularnodes.blender.nodes import styles_mapping as mol_styles_mapping
+import os
+import sys
+from contextlib import contextmanager
 
 
 def convert_list_to_array(value):
@@ -153,3 +156,26 @@ def validate_properties(func):
         return func(*args, **kwargs)
     
     return wrapper
+
+
+
+# Context manager to suppress stdout and stderr
+@contextmanager
+def suppress_blender_output():
+    """Context manager to suppress Blender's low-level stdout and stderr output."""
+    # Open /dev/null for discarding outputs
+    null_fds = [os.open(os.devnull, os.O_RDWR) for _ in range(2)]
+    # Save the original stdout and stderr file descriptors
+    saved_fds = [os.dup(1), os.dup(2)]
+    try:
+        # Redirect stdout and stderr to /dev/null
+        os.dup2(null_fds[0], 1)  # Redirect stdout (fd=1)
+        os.dup2(null_fds[1], 2)  # Redirect stderr (fd=2)
+        yield  # Execute code within the context
+    finally:
+        # Restore original stdout and stderr
+        os.dup2(saved_fds[0], 1)
+        os.dup2(saved_fds[1], 2)
+        # Close file descriptors
+        for fd in null_fds + saved_fds:
+            os.close(fd)

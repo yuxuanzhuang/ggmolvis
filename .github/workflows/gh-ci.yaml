@@ -207,8 +207,7 @@ jobs:
 
       - name: Clone Pages Repo using SSH
         run: |
-          export URL
-          export VERSION=$(python -c 'import version; print(version.__version__)')
+          export VERSION=$(python -c 'import ggmolvis; print(ggmolvis.__version__)')
           UPDATE_JSON=$(pwd)/maintainer/update_json_stubs_sitemap.py
           BRANCH="${GITHUB_REF#refs/heads/}"
 

@@ -8,6 +8,7 @@ dependencies:
   - pip
   - pydantic
   - jupyter
+  - loguru
 
   - MDAnalysis>=2.8.0
 

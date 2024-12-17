@@ -22,6 +22,7 @@ dependencies = [
     "molecularnodes @ git+https://github.com/BradyAJohnston/MolecularNodes.git@v4.2.9",
     "pydantic",
     "jupyter",
+    "loguru",
     "bpy"
 ]
 keywords = [
