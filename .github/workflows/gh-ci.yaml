@@ -208,7 +208,12 @@ jobs:
       - name: Clone Pages Repo using SSH
         run: |
 
-          export VERSION=v0.1.0
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            export FOLDER_NAME="main"
+          else
+            export FOLDER_NAME="latest"
+          export VERSION=$(python -c "import ggmolvis; print(ggmolvis.__version__)" 2>/dev/null | head -n1)
+          echo "$VERSION"
           BRANCH="${GITHUB_REF#refs/heads/}"
 
           cd docs/_build/html
@@ -222,13 +227,15 @@ jobs:
           git reset upstream/gh-pages
 
           # redirects and copies
-          mkdir latest
+          mkdir ${FOLDER_NAME}
+          cp -r ${VERSION}/* ${FOLDER_NAME}/
           touch .
           touch .nojekyll
           cp ../../../devtools/index.html .
 
           git add -A ${VERSION}/
-          git add .nojekyll *.html index.html latest
+          git add -A ${FOLDER_NAME}/
+          git add .nojekyll *.html index.html
 
           for dirname in dev stable documentation_pages ; do
              if [ -d $dirname ]; then git add $dirname; fi
