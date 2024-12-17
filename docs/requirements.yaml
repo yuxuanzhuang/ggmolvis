@@ -3,14 +3,13 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  # Base depends
+  # Base dependencies
   - python=3.11
   - pip
   - pydantic
   - jupyter
 
-  # MDAnalysis
-  - MDAnalysis
+  - MDAnalysis>=2.8.0
 
   # Testing
   - pytest
@@ -19,12 +18,11 @@ dependencies:
   - codecov
 
   # Documentation
-  - mdanalysis-sphinx-theme >=1.0.1
+  - 'mdanalysis-sphinx-theme>=1.0.1'
   - nbsphinx
   - pandoc
 
   # Pip-only installs
   - pip:
-    # get from github
     - git+https://github.com/BradyAJohnston/MolecularNodes.git@v4.2.9
     - bpy
