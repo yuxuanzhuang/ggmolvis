@@ -1,4 +1,4 @@
-ggmolvis.utils.utils
+﻿ggmolvis.utils.utils
 ====================
 
 .. automodule:: ggmolvis.utils.utils
@@ -12,5 +12,6 @@ ggmolvis.utils.utils
       euler_to_quaternion
       look_at
       quaternion_to_euler
+      suppress_blender_output
       validate_properties
    
