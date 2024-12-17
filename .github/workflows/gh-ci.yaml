@@ -195,7 +195,7 @@ jobs:
           conda list
 
       - name: build docs with sphinx
-        if: github.event_name == 'pull_request'
+#        if: github.event_name == 'pull_request'
         continue-on-error: true
         run: |
           sphinx-build --keep-going ./docs/source ./docs/_build/html || true
