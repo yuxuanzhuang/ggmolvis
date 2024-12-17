@@ -207,6 +207,8 @@ jobs:
 
       - name: Clone Pages Repo using SSH
         run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
           export VERSION=v0.1.0
           BRANCH="${GITHUB_REF#refs/heads/}"
 
@@ -233,7 +235,4 @@ jobs:
           # check for anything to commit
           # https://stackoverflow.com/questions/3878624/how-do-i-programmatically-determine-if-there-are-uncommited-changes
           git diff-index --quiet HEAD -- || git commit -m "rebuilt html docs for version ${VERSION} from branch ${BRANCH} with sphinx at ${REV}"
-          
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
           git push -q upstream HEAD:gh-pages
