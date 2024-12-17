@@ -215,7 +215,7 @@ jobs:
           REV=$(git rev-parse --short HEAD)
           git init
           git remote add upstream "git@github.com:yuxuanzhuang/ggmolvis.github.io.git"
-          git fetch --depth 50 upstream $BRANCH gh-pages
+          git fetch --depth 50 upstream gh-pages
           git reset upstream/gh-pages
 
           # redirects and copies
