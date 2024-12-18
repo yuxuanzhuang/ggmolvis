@@ -14,7 +14,7 @@ New to Blender?
 
 `Blender <https://www.blender.org/>`_ is an industry-grade 3D modeling and animation software. 
 Check out the `Molecular Nodes tutorials <https://bradyajohnston.github.io/MolecularNodes/tutorials/>`_ to get started with
-using Molecular Nodes Blender. You can also find a wealth of tutorials on YouTube and other online resources.
+using Molecular Nodes in Blender. You can also find a wealth of tutorials on YouTube and other online resources.
 
 Alternatively, you can also use GGMolVis as a Python module to create visualizations without the need for Blender's GUI.
 
@@ -23,7 +23,7 @@ Using GGMolVis with Blender
 ===========================
 
 If you plan to leverage Blender’s 3D visualization capabilities, 
-follow the **Blender Installation Guide**:
+follow the Blender installation guide below.
 
 - **Features**:
 
@@ -80,6 +80,10 @@ Usage Examples
 
 Once you have GGMolVis installed, you can start using it to show off your favorite molecules and trajectories!
 
+.. image:: ../../rendering/example_ggmolvis.png
+   :width: 800px
+   :align: center
+
 See the example notebooks in the `examples` directory of the GGMolVis repository for inspiration.
 
 .. toctree::
@@ -95,6 +99,4 @@ If you encounter issues or need help:
 
 - Check the `GitHub Issues <https://github.com/yuxuanzhuang/ggmolvis/issues>`_ page for known problems or to report new ones.
 
-- Refer to the `FAQ` page if available.
-
-- Ask questions in the GGMolVis community channels or forums.
+- Ask questions in the `MDAnalysis community Discord channels <https://discord.com/channels/807348386012987462/1256156074008903741>`_!

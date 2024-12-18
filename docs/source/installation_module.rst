@@ -8,8 +8,7 @@ Please note that this method of installation does not involve running Blender's 
 Installation Steps
 ==================
 
-1. Install GGMolVis
-   ----------------
+1. **Install GGMolVis**
 
    First, clone the GGMolVis repository from GitHub:
 
@@ -40,8 +39,7 @@ Installation Steps
    .. note::
       Currently, only Python 3.11 is supported.
 
-2. (Optional) Install a Different Version of MolecularNodes
-   ---------------------------------------------------------
+2. **(Optional) Install a Different Version of MolecularNodes**
 
    If you need a development or alternative version of MolecularNodes, you can install it as follows:
 

@@ -7,28 +7,29 @@ This guide provides instructions for installing GGMolVis and its dependencies, e
 Installation Steps
 ==================
 
-1. Install Blender
-   ---------------
+1. **Install Blender**
 
    Download and install Blender 4.3 or later from the official 
    `Blender website <https://www.blender.org>`_.
 
-2. Install MolecularNodes
-   -----------------------
+2. **Install MolecularNodes**
 
    Within Blender, open **Edit > Preferences**:
 
    * Navigate to **Get Extensions**.
    * Search for **Molecular Nodes** and install it directly from the extensions list.
 
-3. Install BNotebooks to Enable the Blender Jupyter Kernel
-   -------------------------------------------------------
+.. image:: _static/images/get_extensions.png
+  :width: 800
+  :alt: Get Molecular Nodes extension
+
+3. **Install BNotebooks to Enable the Blender Jupyter Kernel**
 
    Download BNotebooks from the 
    `BNotebooks releases page <https://github.com/BradyAJohnston/NotebookConnector/releases/tag/v0.0.5>`_.
 
    * Click the **BNotebooks_0.0.5.zip** link to download.
-   
+
    In Blender, go to **Edit > Preferences > Add-ons**:
    
    * Click the **v** button and select **Install from Disk...** 
@@ -38,8 +39,15 @@ Installation Steps
    * **Restart Blender** to complete the installation.
    * After restarting Blender, return to **Edit > Preferences > Add-ons** and click **Append Kernel** to add the Jupyter kernel to Blender.
 
-4. Install GGMolVis
-   ----------------
+.. image:: _static/images/bnotebook.png
+  :width: 800
+  :alt: Get BNotebooks extension
+
+.. image:: _static/images/jup_kernel.png
+  :width: 800
+  :alt: Get Jupyter kernel
+
+4. **Install GGMolVis**
 
    Clone the GGMolVis repository:
 
@@ -48,7 +56,10 @@ Installation Steps
       git clone git@github.com:yuxuanzhuang/ggmolvis.git
       cd ggmolvis
 
-   Install GGMolVis using Blender's bundled Python. Use the appropriate command for your operating system:
+   Install GGMolVis using Blender's bundled Python. Use the appropriate command for your operating system.
+
+.. note::
+ You may need to adjust the path to the Python executable depending on where Blender is installed on your system.
 
    **macOS:**
 
@@ -68,10 +79,7 @@ Installation Steps
 
       /usr/share/blender/4.3/python/bin/python3.11 -m pip install -e .
 
-   *Note:* You may need to adjust the path to the Python executable depending on where Blender is installed on your system.
-
-5. (Optional) Install a Different Version of MolecularNodes
-   ---------------------------------------------------------
+5. **(Optional) Install a Different Version of MolecularNodes**
 
    If you need a development or alternative version of MolecularNodes:
 
@@ -92,7 +100,10 @@ Verification
 
       jupyter lab
 
-2. In JupyterLab, select the `blender_4.3.0` kernel. You should see a Blender application window open and connect to the Jupyter kernel.
+2. In JupyterLab, select the `blender_4.3.0` kernel. **You should see a Blender application window open** and connect to the Jupyter kernel.
+
+.. image:: https://i.imgur.com/w77dUt0.png
+    :width: 800
 
 3. In a Jupyter notebook cell, run the following commands to verify that GGMolVis is installed correctly:
 

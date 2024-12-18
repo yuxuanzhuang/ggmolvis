@@ -21,6 +21,8 @@ ggmolvis
 [url_license]: https://www.gnu.org/licenses/gpl-3.0
 [url_mda]: https://www.mdanalysis.org
 
+ <a href="https://discord.com/channels/807348386012987462/1256156074008903741"><img src="https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white" alt="Join the scientific visualisation in MDAnalysis discord." style="height:35px"/></a>
+
 **GGMolVis** is a Python package that provides a high-level interface to [MolecularNodes](https://github.com/BradyAJohnston/MolecularNodes) in
   [Blender](https://www.blender.org/) for molecular visualization.
 

@@ -20,15 +20,19 @@ defaults:
 
 jobs:
   main-tests:
-    if: "github.repository == 'yuxuanzhuang/ggmolvis'"
+    if: github.repository == 'yuxuanzhuang/ggmolvis'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         mdanalysis-version: ["latest", "develop"]
         molecular-nodes-version: ["main", "v4.2.9"]
         python-version: ["3.11"]
+        exclude:
+          # Temporarily skip Windows with "latest" MDAnalysis version
+          - os: windows-latest
+            mdanalysis-version: "latest"
 
     steps:
       - uses: actions/checkout@v4

@@ -23,7 +23,7 @@ often work in headless computational environments. Reusability and reproducibili
 are also concerns in an effort to include Molecular Nodes in more computational pipelines
 with FAIR principles in mind.
 
-GGMolVis is designed to offer a streamlined, object-oriented API for
+GGMolVis provides a streamlined, object-oriented API for
 molecular visualization, inspired by the design philosophy of Matplotlib and ggplot2. 
 Such an API would enable users to achieve automated, customizable visualizations with just a 
 few lines of code, and allow platforms like Molecular Dynamics Data Bank (MDDB) and Protein Data 
@@ -37,11 +37,8 @@ up-to-date rendering technologies that Blender provides.
    getting_started
    api
 
-
-
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`
