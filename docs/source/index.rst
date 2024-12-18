@@ -8,7 +8,7 @@ Welcome to ggmolvis's documentation!
 
 As molecular simulations and other molecular entities continue to grow in scale and complexity, 
 there is an increasing demand for flexible, high-quality visualization tools capable of handling 
-these complex datasets efficiently. Molecular Nodes (About – Molecular Nodes ) enables quick import 
+these complex datasets efficiently. Molecular Nodes enables quick import 
 and visualization of structural biology data inside of Blender, a free and open-source 3D computer 
 graphics software tool. Blender has proven to be an innovative platform, providing versatile and 
 industry-quality renderings of static molecules, molecular dynamics (MD) simulations (with the support 
@@ -23,7 +23,7 @@ often work in headless computational environments. Reusability and reproducibili
 are also concerns in an effort to include Molecular Nodes in more computational pipelines
 with FAIR principles in mind.
 
-GGMolVis is designed to offer a streamlined, object-oriented API for
+GGMolVis provides a streamlined, object-oriented API for
 molecular visualization, inspired by the design philosophy of Matplotlib and ggplot2. 
 Such an API would enable users to achieve automated, customizable visualizations with just a 
 few lines of code, and allow platforms like Molecular Dynamics Data Bank (MDDB) and Protein Data 
@@ -37,11 +37,8 @@ up-to-date rendering technologies that Blender provides.
    getting_started
    api
 
-
-
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`
