@@ -11,7 +11,7 @@ dependencies:
   - loguru
 
   # MDAnalysis
-  - MDAnalysis>=2.8.0
+  - MDAnalysis>=2.7.0
 
   # Testing
   - pytest

@@ -1,3 +1,16 @@
+"""
+Utility functions for working with Blender objects and data.
+
+Functions:
+==========
+.. autosummary::
+    convert_list_to_array
+    look_at
+    quaternion_to_euler
+    euler_to_quaternion
+    validate_properties
+    suppress_blender_output
+"""
 import numpy as np
 from functools import wraps
 

@@ -1,3 +1,18 @@
+"""
+========
+GGMolVis
+========
+
+GGmolVis is a high-level API for creating molecular visualizations in Blender.
+It is built on top of the `MolecularNodes` Blender add-on.
+It provides a simple and intuitive interface for creating complex molecular visualizations
+with just a few lines of code.
+
+Classes
+-------
+.. autoclass:: GGMolVis
+    :members:
+"""
 import bpy
 from abc import ABC, abstractmethod
 import molecularnodes as mn

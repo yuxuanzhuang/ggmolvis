@@ -1,3 +1,11 @@
+"""
+This module contains the Molecule class, which is a subclass of SceneObject.
+
+Classes
+=======
+.. autoclass:: Molecule
+    :members:
+"""
 import bpy
 import molecularnodes as mn
 from molecularnodes.entities.trajectory import Trajectory
