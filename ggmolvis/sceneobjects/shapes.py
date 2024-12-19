@@ -8,10 +8,10 @@ Classes
 .. autoclass:: Line
     :members:
 """
+
 import bpy
 from abc import ABC, abstractmethod
 
-from molecularnodes.bpyd.utils import lerp
 from molecularnodes.blender import coll
 import numpy as np
 from typing import Tuple, List, Union
@@ -21,6 +21,10 @@ from ..world import World
 from ..camera import Camera
 from ..properties import Color, Material
 from ..utils import convert_list_to_array, look_at
+
+
+def lerp(a, b, t) -> np.ndarray:
+    return np.add(a, np.multiply(np.subtract(b, a), t))
 
 
 class Shape(SceneObject):
@@ -118,8 +122,10 @@ class Line(Shape):
         # get the next frame
         frame_b = frame_a + 1
         if frame_b >= self.start_points.shape[0]:
-            return (self.start_points[-1] * self.world_scale,
-                    self.end_points[-1] * self.world_scale)
+            return (
+                self.start_points[-1] * self.world_scale,
+                self.end_points[-1] * self.world_scale,
+            )
 
         locations_a = []
         locations_b = []
