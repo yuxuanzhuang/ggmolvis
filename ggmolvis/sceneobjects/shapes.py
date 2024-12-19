@@ -20,11 +20,7 @@ from .base import SceneObject
 from ..world import World
 from ..camera import Camera
 from ..properties import Color, Material
-from ..utils import convert_list_to_array, look_at
-
-
-def lerp(a, b, t) -> np.ndarray:
-    return np.add(a, np.multiply(np.subtract(b, a), t))
+from ..utils import convert_list_to_array, look_at, lerp
 
 
 class Shape(SceneObject):
