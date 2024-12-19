@@ -82,6 +82,7 @@ class Camera(GGMolvisArtist):
         samples: int = 64,
         engine="CYCLES",
         format="PNG",
+        verbose=False,
     ):
         """Render the scene with this camera"""
         bpy.context.scene.camera = self.object
@@ -98,9 +99,12 @@ class Camera(GGMolvisArtist):
             )
         elif mode == "movie":
             renderer = MovieRenderer(
-                resolution=resolution, filepath=filepath, engine=engine, samples=samples
+                resolution=resolution,
+                filepath=filepath,
+                engine=engine,
+                samples=samples,
             )
         else:
             raise ValueError(f"Invalid mode: {mode}")
-        renderer.render()
+        renderer.render(verbose=verbose)
         renderer.display_in_notebook()
