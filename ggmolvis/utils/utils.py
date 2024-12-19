@@ -11,6 +11,7 @@ Functions:
     validate_properties
     suppress_blender_output
 """
+
 import numpy as np
 from functools import wraps
 
@@ -20,6 +21,21 @@ from molecularnodes.blender.nodes import styles_mapping as mol_styles_mapping
 import os
 import sys
 from contextlib import contextmanager
+
+
+def lerp(a, b, t) -> np.ndarray:
+    """
+    Linearly interpolates between two arrays a and b by a factor of t.
+    Parameters:
+    a (np.ndarray): The starting array.
+    b (np.ndarray): The ending array.
+    t (float or np.ndarray): The interpolation factor, where 0 <= t <= 1.
+                             If t is an array, it should be broadcastable to the shape of a and b.
+    Returns:
+    np.ndarray: The interpolated array.
+    """
+
+    return np.add(a, np.multiply(np.subtract(b, a), t))
 
 
 def convert_list_to_array(value):
