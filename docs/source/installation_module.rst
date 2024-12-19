@@ -8,7 +8,7 @@ Please note that this method of installation does not involve running Blender's 
 Installation Steps
 ==================
 
-1. **Install GGMolVis**
+1. **Install GGMolVis with `conda`**
 
    First, clone the GGMolVis repository from GitHub:
 
@@ -39,7 +39,24 @@ Installation Steps
    .. note::
       Currently, only Python 3.11 is supported.
 
-2. **(Optional) Install a Different Version of MolecularNodes**
+2. **Install GGMolVis with `uv`**
+
+   If you have [`uv`](https://github.com/astral-sh/uv) installed, you can do:
+
+   .. code-block:: bash
+
+      uv venv -p 3.11
+      source .venv/bin/activate
+      uv pip install 'ggmolvis @ https://github.com/yuxuanzhuang/ggmolvis.git'
+      uv pip install 'mdanalysis @ git+https://github.com/MDAnalysis/mdanalysis.git@develop#subdirectory=package'
+      # optionally: install jupyter-related things
+      uv pip install ipython ipykernel jupyter
+
+   .. note::
+      Currently, rendering in VSCode gives a PIL-related error, but the rendering itself finishes successfully,
+      if you simply open the image saved on disk in `/tmp`
+
+3. **(Optional) Install a Different Version of MolecularNodes**
 
    If you need a development or alternative version of MolecularNodes, you can install it as follows:
 
