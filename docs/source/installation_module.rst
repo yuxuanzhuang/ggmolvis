@@ -41,7 +41,7 @@ Installation Steps
 
 2. **Install GGMolVis with `uv`**
 
-   If you have [`uv`](https://github.com/astral-sh/uv) installed, you can do:
+   If you have [uv](https://github.com/astral-sh/uv) installed, you can do:
 
    .. code-block:: bash
 
