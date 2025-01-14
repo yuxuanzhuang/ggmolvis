@@ -23,6 +23,10 @@ ggmolvis
 
  <a href="https://discord.com/channels/807348386012987462/1256156074008903741"><img src="https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white" alt="Join the scientific visualisation in MDAnalysis discord." style="height:35px"/></a>
 
+> **Warning**: This package is under active development and is not yet ready for production use.
+> API changes are expected and any feedback is welcome.
+> See a list of TODO list in the [project board](./TODO.md).
+
 **GGMolVis** is a Python package that provides a high-level interface to [MolecularNodes](https://github.com/BradyAJohnston/MolecularNodes) in
   [Blender](https://www.blender.org/) for molecular visualization.
 
@@ -78,9 +82,9 @@ vis.render(mode='movie')
 ### Copyright
 
 The ggmolvis source code is hosted at https://github.com/yuxuanzhuang/ggmolvis
-and is available under the GNU General Public License, version 2 (see the file [LICENSE](https://github.com/yuxuanzhuang/ggmolvis/blob/main/LICENSE)).
+and is available under the GNU General Public License, version 3 (see the file [LICENSE](https://github.com/yuxuanzhuang/ggmolvis/blob/main/LICENSE)).
 
-Copyright (c) 2024, Yuxuan Zhuang
+Copyright (c) 2025, Yuxuan Zhuang
 
 
 #### Acknowledgements

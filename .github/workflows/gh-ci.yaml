@@ -27,7 +27,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         mdanalysis-version: ["latest", "develop"]
-        molecular-nodes-version: ["main", "v4.2.9"]
+        molecular-nodes-version: ["main", "v4.2.9", "v4.2.10"]
         python-version: ["3.11"]
         exclude:
           # Temporarily skip Windows with "latest" MDAnalysis version
