@@ -69,14 +69,13 @@ class Camera(GGMolvisArtist):
         coll_obj.objects.link(self.object)
 
     def __getstate__(self):
-        state = self.__dict__.copy()
+        state = super().__getstate__()
         del state['camera']
         return state
     
     def __setstate__(self, state):
-        self.__dict__.update(state)
-        self.camera = bpy.data.cameras[state['name']]
-        self._set_property()
+        super().__setstate__(state)
+        self.camera = bpy.data.cameras[state['_name']]
 
     def render(self,
                mode='image',

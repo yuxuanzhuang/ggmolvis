@@ -127,3 +127,19 @@ class GGMolvisArtist(ABC):
     def _remove(self):
         """Remove the object from the session"""
         self.session._ggmolvis.remove(self)
+    
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['_session']
+
+        # remove bpy objects related to the object
+        if 'object' in state:
+            del state['object']
+
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        # reattach the session
+        SESSION = mn.session.get_session()
+        self._session = SESSION

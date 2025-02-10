@@ -181,7 +181,7 @@ class GGMolVis(GGMolvisArtist):
             bpy.context.scene.cycles.device = "GPU"
         except:
             pass
-        
+    
     @validate_properties
     def molecule(self,
                  universe: Union[AtomGroup, mda.Universe],

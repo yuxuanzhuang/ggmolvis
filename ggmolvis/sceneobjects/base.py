@@ -189,13 +189,6 @@ class SceneObject(GGMolvisArtist):
     def material(self, value):
         raise AttributeError("Use `set_material` instead")
 
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        try:
-            del state["object"]
-        except KeyError:
-            pass
-        return state        
 
 class SceneObjectCollection:
     """Class for the collection of scene objects"""
