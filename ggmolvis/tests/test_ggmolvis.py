@@ -1,38 +1,35 @@
-import unittest
+import pickle
 from ggmolvis import GGMolVis
 from ggmolvis.world import World
 from ggmolvis.camera import Camera
 
-class TestGGMolVis(unittest.TestCase):
+def test_initialization(ggmv):
+    # Check if the global camera and world are set up correctly
+    assert isinstance(ggmv.global_camera, Camera)
+    assert isinstance(ggmv.global_world, World)
 
-    def test_singleton_pattern(self):
-        # Create first instance
-        vis1 = GGMolVis()
-        self.assertIsNotNone(vis1)
-        self.assertIsInstance(vis1, GGMolVis)
+    # Check if the artists dictionary is populated with default values
+    for key in ['molecules', 'shapes', 'texts', 'cameras', 'lights', 'worlds']:
+        assert key in ggmv._artists_dict
 
-        # Create second instance
-        vis2 = GGMolVis()
-        self.assertIs(vis1, vis2)
+    # Check if the scene is set up correctly
+    assert ggmv._subframes == 0
 
-    def test_initialization(self):
-        # Create instance
-        vis = GGMolVis()
+def test_singleton_pattern(ggmv):
 
-        # Check if the global camera and world are set up correctly
-        self.assertIsInstance(vis.global_camera, Camera)
-        self.assertIsInstance(vis.global_world, World)
+    # Create second instance
+    vis2 = GGMolVis()
+    assert ggmv is vis2
 
-        # Check if the artists dictionary is populated with default values
-        self.assertIn('molecules', vis._artists_dict)
-        self.assertIn('shapes', vis._artists_dict)
-        self.assertIn('texts', vis._artists_dict)
-        self.assertIn('cameras', vis._artists_dict)
-        self.assertIn('lights', vis._artists_dict)
-        self.assertIn('worlds', vis._artists_dict)
+def test_persistence(tmpdir, ggmv):
+    # Save the object to a file
+    filename = tmpdir.join('vis.pkl')
+    with open (filename, 'wb') as f:
+        pickle.dump(ggmv, f)
+    
+    # Load the object from the file
+    with open(filename, 'rb') as f:
+        vis2 = pickle.load(f)
 
-        # Check if the scene is set up correctly
-        self.assertEqual(vis._subframes, 0)
-
-if __name__ == '__main__':
-    unittest.main()
+    # Check if the loaded object is the same as the original object
+    assert ggmv is vis2
