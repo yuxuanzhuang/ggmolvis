@@ -72,6 +72,24 @@ class Molecule(SceneObject):
         set_selection(self.object, self.name)
         return self.object
     
+    def __getstate__(self):
+        state = super().__getstate__()
+        state['trajectory_uuid'] = self.trajectory.uuid
+        del state['trajectory']
+        return state
+    
+    def __setstate__(self, state):
+        super().__setstate__(state)
+        # get the trajectory object from mn session
+        # TODO: clear up in later versions
+        # this handles reloading sessions which don't have the `entities` attribute
+        session = mn.session.get_session()
+        if hasattr(session, "entities"):
+            self.trajectory = self._session.entities.get(state['trajectory_uuid'])
+        else:
+            self.trajectory = self._session.trajectories.get(state['trajectory_uuid'])
+
+
     @property
     def object(self):
         return self.trajectory.object
