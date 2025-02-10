@@ -78,17 +78,6 @@ class Material(Property):
             "with the key as property name and value as the modifier.")
         self._material_modifier.update(value)
 
-<<<<<<< HEAD
-    def __getstate__(self):
-        state = super().__getstate__()
-        state.pop("_material", None)
-        return state
-
-    def __setstate__(self, state):
-        super().__setstate__(state)
-    
-=======
->>>>>>> eb027fa (use material name instead of link bpy material)
 
 class MoleculeMaterial(Material):
     def _apply_to(self, obj, frame: int = 0):
