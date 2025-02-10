@@ -24,20 +24,16 @@ class Material(Property):
         if default_material is None:
             raise ValueError(f"Material mapping for {material_name} not found.")
 
-        self._material = default_material.copy()
-        self._material.name = f"{self.name}"
-        self.material_name = self._material.name
+        material_copied = default_material.copy()
+        material_copied.name = f"{self.name}"
+        self.material_name = material_copied.name
 
     @property
     def material(self):
         """Return the material, handling missing cases gracefully."""
-        if self._material is not None:
-            return self._material
-        
         # Attempt to retrieve from Blender if not stored in memory
         if hasattr(self, "material_name") and self.material_name in bpy.data.materials:
-            self._material = bpy.data.materials[self.material_name]
-            return self._material
+            return bpy.data.materials[self.material_name]
 
         return None  # Material is not set
 
@@ -46,7 +42,6 @@ class Material(Property):
         """Set the material and update material_name."""
         if not isinstance(material, bpy.types.Material):
             raise TypeError("Assigned material must be a Blender Material.")
-        self._material = material
         self.material_name = material.name
 
 
@@ -83,6 +78,7 @@ class Material(Property):
             "with the key as property name and value as the modifier.")
         self._material_modifier.update(value)
 
+<<<<<<< HEAD
     def __getstate__(self):
         state = super().__getstate__()
         state.pop("_material", None)
@@ -90,8 +86,9 @@ class Material(Property):
 
     def __setstate__(self, state):
         super().__setstate__(state)
-        self._material = None
     
+=======
+>>>>>>> eb027fa (use material name instead of link bpy material)
 
 class MoleculeMaterial(Material):
     def _apply_to(self, obj, frame: int = 0):
