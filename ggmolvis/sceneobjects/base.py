@@ -168,6 +168,20 @@ class SceneObject(GGMolvisArtist):
     def render(self, **kwargs):
         self.camera.render(**kwargs)
 
+    def set_text(self,
+                 text: str,
+                 /,
+                 *,
+                 location: tuple,
+                 rotation_radians: tuple = (1.13, 0, 0),
+                 text_size: float = 0.1,
+                 ):
+        bpy.ops.object.text_add(location=location)
+        text_object = bpy.context.active_object
+        text_object.data.body = text
+        text_object.data.size = text_size
+        text_object.rotation_euler = rotation_radians
+
     @property
     def color(self):
         return self._color
