@@ -44,7 +44,7 @@ class Renderer:
 
 
 class MovieRenderer(Renderer):
-    def __init__(self, resolution=(640, 360), filepath=None):
+    def __init__(self, resolution=(640, 360), filepath=None, frame_bounds=None):
         bpy.context.scene.render.resolution_x = resolution[0]
         bpy.context.scene.render.resolution_y = resolution[1]
         bpy.context.scene.render.filepath = filepath or tempfile.NamedTemporaryFile(suffix=".mp4").name
@@ -53,9 +53,13 @@ class MovieRenderer(Renderer):
         bpy.context.scene.render.ffmpeg.format = 'MPEG4'
         bpy.context.scene.render.ffmpeg.codec = 'H264'
         bpy.context.scene.render.ffmpeg.constant_rate_factor = 'HIGH'
+        self.frame_bounds = frame_bounds
     
     def render(self):
         # Render the movie
+        if self.frame_bounds is not None:
+            bpy.context.scene.frame_start = self.frame_bounds[0]
+            bpy.context.scene.frame_end = self.frame_bounds[1]
         bpy.ops.render.render(animation=True)
 
     def display_in_notebook(self):

@@ -82,6 +82,7 @@ class Camera(GGMolvisArtist):
                mode='image',
                frame=None,
                filepath=None,
+               frame_bounds=None,
                resolution=(640, 360)):
         """Render the scene with this camera"""
         bpy.context.scene.camera = self.object
@@ -93,6 +94,7 @@ class Camera(GGMolvisArtist):
                                 filepath=filepath)
         elif mode == 'movie':
             renderer = MovieRenderer(resolution=resolution,
-                            filepath=filepath)
+                            filepath=filepath,
+                            frame_bounds=frame_bounds)
         renderer.render()
         renderer.display_in_notebook()
