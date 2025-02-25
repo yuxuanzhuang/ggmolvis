@@ -40,6 +40,7 @@ class SceneObject(GGMolvisArtist):
         color="black",
         material="backdrop",
         style="default",
+        lens=24.0,
     ):
         self.world = World(location=location, rotation=rotation, scale=scale)
         super().__init__()
@@ -59,6 +60,7 @@ class SceneObject(GGMolvisArtist):
 
         self.world._apply_to(self.object)
         self._init_camera()
+        self.lens = lens
         self._move_to_collection()
 
         self.draw()
@@ -74,7 +76,7 @@ class SceneObject(GGMolvisArtist):
         self._style = Style(self, style)
 
     def _init_camera(self):
-        self.camera = Camera(name=f"{self.name}_camera")
+        self.camera = Camera(name=f"{self.name}_camera", lens=self.lens)
         size_obj_xyz = np.array(self.object.dimensions)
         # center of the object
         center_xyz = np.zeros(3)
