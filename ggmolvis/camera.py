@@ -19,6 +19,7 @@ from .base import GGMolvisArtist
 from .world import World, Location, Rotation
 from . import SESSION
 from .renderer import Renderer, MovieRenderer
+from .compositor import _set_compositor_bg
 
 class Camera(GGMolvisArtist):
     """Class for the camera."""
@@ -82,11 +83,15 @@ class Camera(GGMolvisArtist):
                mode='image',
                frame=None,
                filepath=None,
-               resolution=(640, 360)):
+               resolution=(640, 360),
+               composite_bg_rgba=None):
         """Render the scene with this camera"""
         bpy.context.scene.camera = self.object
         if frame is not None:
             bpy.context.scene.frame_set(frame)
+
+        if composite_bg_rgba is not None:
+           _set_compositor_bg(composite_bg_rgba)
 
         if mode == 'image':        
             renderer = Renderer(resolution=resolution,
