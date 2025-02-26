@@ -191,7 +191,8 @@ class GGMolVis(GGMolvisArtist):
                  rotation: Union[np.ndarray, list] = None,
                  scale: Union[np.ndarray, list] = None,
                  color='default',
-                 material='default'):
+                 material='default',
+                 lens: float = 24.0):
         """Create a `Molecule` object and add it to the visualization.
         
         Parameters:
@@ -212,6 +213,8 @@ class GGMolVis(GGMolvisArtist):
             The color of the molecule. Default is 'default'
         material: str
             The material of the molecule. Default is 'default'
+        lens: float
+            The focal length of the camera associated with the molecule.
 
         Returns:
         --------
@@ -225,7 +228,8 @@ class GGMolVis(GGMolvisArtist):
                             location=location,
                             rotation=rotation,
                             scale=scale,
-                            material=material)
+                            material=material,
+                            lens=lens)
         self.molecules.append(molecule)
         return molecule
 
