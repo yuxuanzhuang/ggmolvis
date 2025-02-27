@@ -47,6 +47,7 @@ class SceneObject(GGMolvisArtist):
         self.name = name
 
         self._subframes = 0
+        self._average = 0
 
         # Create the object
         obj = self._create_object()
