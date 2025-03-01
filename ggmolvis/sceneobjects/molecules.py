@@ -68,6 +68,7 @@ class Molecule(SceneObject):
             name=self.name, style=self._style_name
         )
         self.trajectory.subframes = self.subframes
+        self.trajectory.average = self.average
         self.trajectory.add_selection_from_atomgroup(
             self.atomgroup, name=self.name
         )

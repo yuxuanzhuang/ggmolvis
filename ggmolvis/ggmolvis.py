@@ -73,10 +73,16 @@ class GGMolVis(GGMolvisArtist):
         The global camera object
     subframes: int
         Number of subframes to render. It will be a global setting
-        for all objects. Default is 1
-    
+        for all objects. Default is 0. For clarity, when subframes is set to `1`
+        the total frame count will double, and when it is set to `2` the
+        total frame count will triple.
+    average: int
+        Number of flanking frames to average over--this can help reduce
+        "jittering" in movies. In contrast to `subframes`, no new frames
+        are added. It will be a global setting for all objects. Default is 0.
 
-    
+
+
     """
     def __new__(cls):
         if hasattr(SESSION, 'ggmolvis'):
@@ -109,6 +115,7 @@ class GGMolVis(GGMolvisArtist):
         self._global_camera = self.cameras[0]
 
         self._subframes = 0
+        self._average = 0
 
         # pre-defined camera position
         bpy.data.collections.get('MolecularNodes').objects.link(self._global_camera.object)
@@ -172,6 +179,16 @@ class GGMolVis(GGMolvisArtist):
         self._subframes = value
         for molecule in self.molecules:
             molecule.trajectory.subframes = value
+
+    @property
+    def average(self):
+        return self._average
+
+    @average.setter
+    def average(self, value):
+        self._average = value
+        for molecule in self.molecules:
+            molecule.trajectory.average = value
 
     def _set_scene(self):
         """Set up the scene with transparent background and CYCLES rendering."""
