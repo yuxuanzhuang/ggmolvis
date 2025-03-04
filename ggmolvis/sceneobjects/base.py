@@ -60,8 +60,8 @@ class SceneObject(GGMolvisArtist):
         self._init_style(style)
 
         self.world._apply_to(self.object)
-        self._init_camera()
         self.lens = lens
+        self._init_camera()
         self._move_to_collection()
 
         self.draw()
