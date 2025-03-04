@@ -9,6 +9,7 @@ from ggmolvis import material_contrib
 
 # make approved user-contributed add-in materials available
 material_contrib.metal.material_generator()
+material_contrib.matte.material_generator()
 
 class Material(Property):
     """Class for the material."""

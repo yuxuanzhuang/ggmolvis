@@ -149,6 +149,7 @@ materials_mapping = {
     "backdrop": "Backdrop",
     # user-contributed add-in materials
     "metal": "ggmolvis_metal",
+    "matte": "ggmolvis_matte",
 }
 
 
