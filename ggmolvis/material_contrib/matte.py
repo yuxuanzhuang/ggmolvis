@@ -18,11 +18,9 @@ def material_generator():
         principled.inputs["Specular"].default_value = 1.0
     except KeyError:
         principled.inputs["Specular IOR Level"].default_value = 1.0
-    for ele in principled.inputs:
-        print(ele)
-    principled.inputs["Subsurface Scale"].default_value = 5.5
-    principled.inputs["Subsurface Radius"].default_value = (5.5, 5.5, 5.5)
-    principled.inputs["Diffuse Roughness"].default_value = 1.0
+    principled.inputs["Subsurface Weight"].default_value = 0.5
+    principled.inputs["Subsurface Scale"].default_value = 0.5
+    principled.inputs["Subsurface Radius"].default_value = (0.1, 0.1, 0.1)
     attribute = material.node_tree.nodes.new("ShaderNodeAttribute")
     attribute.attribute_name = "Color"
     output = material.node_tree.nodes.new("ShaderNodeOutputMaterial")
