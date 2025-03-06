@@ -60,8 +60,8 @@ class SceneObject(GGMolvisArtist):
         self._init_style(style)
 
         self.world._apply_to(self.object)
-        self._init_camera()
         self.lens = lens
+        self._init_camera()
         self._move_to_collection()
 
         self.draw()
@@ -108,7 +108,12 @@ class SceneObject(GGMolvisArtist):
             coll = bpy.data.collections.new(self.name)
             mn_coll.children.link(coll)
         coll.objects.link(self.object)
-        mn_coll.objects.unlink(self.object)
+        try:
+            mn_coll.objects.unlink(self.object)
+        except RuntimeError:
+            # hack to avoid
+            # RuntimeError: Error: Object 'Text' not in collection 'MolecularNodes'
+            pass
         self.camera._move_to_collection(self.name)
 
 
