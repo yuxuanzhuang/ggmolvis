@@ -18,8 +18,8 @@ from typing import Tuple, List, Union
 from .base import GGMolvisArtist
 from .world import World, Location, Rotation
 from . import SESSION
-from .renderer import Renderer, MovieRenderer
-from .compositor import _set_compositor_bg, _create_frame_image, _composit_frame_label
+from .renderer import Renderer, MovieRenderer, frame_number_render_handler
+from .compositor import _set_compositor_bg
 
 class Camera(GGMolvisArtist):
     """Class for the camera."""
@@ -96,14 +96,8 @@ class Camera(GGMolvisArtist):
            _set_compositor_bg(composite_bg_rgba)
 
         if add_frame_numbers is not None:
-            img = _create_frame_image(frame_number=self.frame_number,
-                                      width=resolution[0],
-                                      height=resolution[1],
-                                      text=f"frame: {self.frame_number}")
-            _composit_frame_label(img=img,
-                                  frame=self.frame_number,
-                                  width=resolution[0],
-                                  height=resolution[1])
+            bpy.app.handlers.render_pre.clear()
+            bpy.app.handlers.render_pre.append(frame_number_render_handler)
 
         if mode == 'image':        
             renderer = Renderer(resolution=resolution,

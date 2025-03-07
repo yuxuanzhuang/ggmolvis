@@ -33,8 +33,7 @@ def _set_compositor_bg(rgba: tuple[float, float, float, float]):
     links.new(mix_node.outputs[0], composite.inputs[0])
 
 
-def _create_frame_image(frame_number: int,
-                        width: int,
+def _create_frame_image(width: int,
                         height: int,
                         text: str):
     img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
