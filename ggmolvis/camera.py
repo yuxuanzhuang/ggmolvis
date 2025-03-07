@@ -96,11 +96,14 @@ class Camera(GGMolvisArtist):
            _set_compositor_bg(composite_bg_rgba)
 
         if add_frame_numbers is not None:
-            img_path = _create_frame_image(frame_number=self.frame_number,
-                                           width=resolution[0],
-                                           height=resolution[1],
-                                           text=f"frame: {self.frame_number}")
-            _composit_frame_label(img_path=img_path)
+            img = _create_frame_image(frame_number=self.frame_number,
+                                      width=resolution[0],
+                                      height=resolution[1],
+                                      text=f"frame: {self.frame_number}")
+            _composit_frame_label(img=img,
+                                  frame=self.frame_number,
+                                  width=resolution[0],
+                                  height=resolution[1])
 
         if mode == 'image':        
             renderer = Renderer(resolution=resolution,

@@ -1,7 +1,5 @@
-import os
-
-
 import bpy
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -48,12 +46,10 @@ def _create_frame_image(frame_number: int,
     x = (width - text_width) // 2
     y = height - text_height - 40
     draw.text((x, y), text, font=font, fill=(255, 255, 255, 255))
-    os.makedirs("frame_overlays", exist_ok=True)
-    out_path = os.path.join("frame_overlays", f"frame_{frame_number}.png")
-    img.save(out_path, "PNG")
-    return out_path
+    img = np.flipud(np.array(img).astype(float)) / 255.0
+    return img.ravel()
 
-def _composit_frame_label(img_path):
+def _composit_frame_label(img, frame, width, height):
     scene = bpy.context.scene
     scene.use_nodes = True
     tree = scene.node_tree
@@ -63,7 +59,12 @@ def _composit_frame_label(img_path):
     image_node = tree.nodes.new('CompositorNodeImage')
     alpha_over = tree.nodes.new('CompositorNodeAlphaOver')
     composite = tree.nodes.new('CompositorNodeComposite')
-    image_node.image = bpy.data.images.load(img_path)
+    temp_image = bpy.data.images.new(f"frame_text_{frame}",
+                                     width=width,
+                                     height=height,
+                                     alpha=True)
+    temp_image.pixels = img
+    image_node.image = temp_image
     links.new(render_layers.outputs['Image'], alpha_over.inputs[2])
     links.new(image_node.outputs['Image'], alpha_over.inputs[1])
     links.new(alpha_over.outputs['Image'], composite.inputs['Image'])
