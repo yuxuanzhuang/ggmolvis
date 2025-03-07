@@ -22,6 +22,8 @@ import tempfile
 from PIL import Image
 from IPython.display import display, Video
 
+from .compositor import _create_frame_image, _composit_frame_label
+
 class Renderer:
     def __init__(self, resolution=(1280, 720), filepath=None):
         # Set the render resolution
@@ -60,3 +62,16 @@ class MovieRenderer(Renderer):
 
     def display_in_notebook(self):
         return bpy.context.scene.render.filepath
+
+
+def frame_number_render_handler(scene):
+    frame = scene.frame_current
+    width = scene.render.resolution_x
+    height = scene.render.resolution_y
+    img = _create_frame_image(width=width,
+                              height=height,
+                              text=f"frame: {frame}")
+    _composit_frame_label(img=img,
+                          frame=frame,
+                          width=width,
+                          height=height)
