@@ -1,4 +1,8 @@
+import os
+
+
 import bpy
+from PIL import Image, ImageDraw, ImageFont
 
 
 def _set_compositor_bg(rgba: tuple[float, float, float, float]):
@@ -29,3 +33,37 @@ def _set_compositor_bg(rgba: tuple[float, float, float, float]):
     links.new(render_layers.outputs['Alpha'], mix_node.inputs[0])
     links.new(render_layers.outputs['Image'], mix_node.inputs[2])
     links.new(mix_node.outputs[0], composite.inputs[0])
+
+
+def _create_frame_image(frame_number: int,
+                        width: int,
+                        height: int,
+                        text: str):
+    img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("/System/Library/Fonts/Geneva.ttf", 80)
+    text_bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = text_bbox[2] - text_bbox[0]
+    text_height = text_bbox[3] - text_bbox[1]
+    x = (width - text_width) // 2
+    y = height - text_height - 40
+    draw.text((x, y), text, font=font, fill=(255, 255, 255, 255))
+    os.makedirs("frame_overlays", exist_ok=True)
+    out_path = os.path.join("frame_overlays", f"frame_{frame_number}.png")
+    img.save(out_path, "PNG")
+    return out_path
+
+def _composit_frame_label(img_path):
+    scene = bpy.context.scene
+    scene.use_nodes = True
+    tree = scene.node_tree
+    links = tree.links
+    tree.nodes.clear()
+    render_layers = tree.nodes.new('CompositorNodeRLayers')
+    image_node = tree.nodes.new('CompositorNodeImage')
+    alpha_over = tree.nodes.new('CompositorNodeAlphaOver')
+    composite = tree.nodes.new('CompositorNodeComposite')
+    image_node.image = bpy.data.images.load(img_path)
+    links.new(render_layers.outputs['Image'], alpha_over.inputs[2])
+    links.new(image_node.outputs['Image'], alpha_over.inputs[1])
+    links.new(alpha_over.outputs['Image'], composite.inputs['Image'])

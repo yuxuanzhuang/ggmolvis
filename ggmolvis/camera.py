@@ -19,7 +19,7 @@ from .base import GGMolvisArtist
 from .world import World, Location, Rotation
 from . import SESSION
 from .renderer import Renderer, MovieRenderer
-from .compositor import _set_compositor_bg
+from .compositor import _set_compositor_bg, _create_frame_image, _composit_frame_label
 
 class Camera(GGMolvisArtist):
     """Class for the camera."""
@@ -54,6 +54,7 @@ class Camera(GGMolvisArtist):
     def _update_frame(self, frame_number):
         """Update the camera's state for the given frame"""
         self.world._apply_to(self.object, frame_number)
+        self.frame_number = frame_number
     
     def set_view(self):
         """Set the current view to this camera"""
@@ -84,7 +85,8 @@ class Camera(GGMolvisArtist):
                frame=None,
                filepath=None,
                resolution=(640, 360),
-               composite_bg_rgba=None):
+               composite_bg_rgba=None,
+               add_frame_numbers=None):
         """Render the scene with this camera"""
         bpy.context.scene.camera = self.object
         if frame is not None:
@@ -92,6 +94,13 @@ class Camera(GGMolvisArtist):
 
         if composite_bg_rgba is not None:
            _set_compositor_bg(composite_bg_rgba)
+
+        if add_frame_numbers is not None:
+            img_path = _create_frame_image(frame_number=self.frame_number,
+                                           width=resolution[0],
+                                           height=resolution[1],
+                                           text=f"frame: {self.frame_number}")
+            _composit_frame_label(img_path=img_path)
 
         if mode == 'image':        
             renderer = Renderer(resolution=resolution,
