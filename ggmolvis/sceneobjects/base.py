@@ -56,7 +56,7 @@ class SceneObject(GGMolvisArtist):
         self.name = obj.name
 
         self._init_color(color)
-        self._init_material(material)
+        self._init_material(material, color)
         self._init_style(style)
 
         self.world._apply_to(self.object)

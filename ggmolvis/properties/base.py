@@ -13,6 +13,7 @@ class Property(GGMolvisArtist):
         self._scene_object = scene_object
         self._property_name = property_name
         self._set_property()
+        self.color = kwargs.get("color")
 
     @abstractmethod
     def _set_property(self):
