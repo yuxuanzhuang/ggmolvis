@@ -35,7 +35,21 @@ class Material(Property):
     def _apply_to(self, obj, frame: int = 0):
         obj.data.materials.append(self.material)
     
-    def _modify_material(self, material, frame: int = 0):
+    def _modify_material(self, material, frame: int = 0,
+                         color=None):
+        color_dict = {"violet": (0.58, 0.0, 0.827, 1.0),
+                      "green": (0, 0.9, 0.0, 1.0),
+                      "red": (0.9, 0.0, 0.0, 1.0),
+                      "blue": (0.0, 0.0, 0.9, 1.0),
+                      "black": (0.0, 0.0, 0.0, 1.0),
+                      "default": (0.0, 0.0, 0.0, 1.0),
+                      }
+        if color is not None:
+            material.node_tree.nodes.clear()
+            principled = material.node_tree.nodes.new("ShaderNodeBsdfPrincipled")
+            principled.inputs["Base Color"].default_value = color_dict[color]
+            output = material.node_tree.nodes.new("ShaderNodeOutputMaterial")
+            material.node_tree.links.new(principled.outputs["BSDF"], output.inputs["Surface"])
         for key, values in self.material_modifier.items():
             # if values is a number
             if isinstance(values, (int, float)):
@@ -75,5 +89,7 @@ class MoleculeMaterial(Material):
     def _apply_to(self, obj, frame: int = 0):
         """Apply material to the object."""
 
+        if self.color is None:
+            self.color = "black"
         set_mn_material(obj, self.material_name)
-        self._modify_material(self.material, frame)
+        self._modify_material(self.material, frame, color=self.color)
