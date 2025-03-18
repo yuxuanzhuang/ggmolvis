@@ -21,7 +21,3 @@ class RMSDVisualizer(Visualizer):
         mobile_molecule.color.set_map(values=rmsd_results, cmap='coolwarm')
 
         return ggmv
-
-    @property
-    def camera_world(self):
-        return self._camera_world
