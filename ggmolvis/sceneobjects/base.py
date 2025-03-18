@@ -77,6 +77,7 @@ class SceneObject(GGMolvisArtist):
     def _set_camera_view(self):
         """
         Set camera view based on the object.
+        # TODO: this is way to janky, needs to be improved
         """
         # only run if the camera view is active
         # to avoid unnecessary calculations
