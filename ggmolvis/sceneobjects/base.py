@@ -59,6 +59,7 @@ class SceneObject(GGMolvisArtist):
         self.world._apply_to(self.object)
 
         self.camera_world = World()
+        self._set_camera_view()
         self._camera_view_active = False
 
         self.draw()
@@ -73,14 +74,12 @@ class SceneObject(GGMolvisArtist):
     def _init_style(self, style="default"):
         self._style = Style(self, style)
 
-    def _set_camera(self):
+    def _set_camera_view(self):
         """
         Set camera view based on the object.
         """
         # only run if the camera view is active
         # to avoid unnecessary calculations
-        if not self._camera_view_active:
-            return
         size_obj_xyz = np.array(self.object.dimensions)
         # center of the object
         center_xyz = np.zeros(3)
@@ -110,7 +109,8 @@ class SceneObject(GGMolvisArtist):
         self.material._apply_to(object, frame)
         self.color._apply_to(object, frame)
         self.world._apply_to(object, frame)
-        self._set_camera()
+        if self._camera_view_active:
+            self._set_camera_view()
 
     @abstractmethod
     def _create_object(self):

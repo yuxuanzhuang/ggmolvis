@@ -189,20 +189,49 @@ class GGMolVis(GGMolvisArtist):
     
     def render(self,
                object: SceneObject = None,
+               track: bool = False,
+               frame: int = None,
+               frame_range: tuple = None,
                **kwargs):
         """
         Render the current scene.
         """
+        if frame is not None and frame_range is not None:
+            raise ValueError("Both frame and frame_range cannot be set")
+        if frame is not None:
+            render_mode = 'image'
+            bpy.context.scene.frame_set(frame)
+        elif frame_range is not None:
+            render_mode = 'movie'
+            if len(frame_range) != 3:
+                raise ValueError("frame_range must be a tuple of 3 integers (start, end, step)")
+            start, end, step = frame_range
+            old_start = bpy.context.scene.frame_start
+            old_end = bpy.context.scene.frame_end
+            old_step = bpy.context.scene.frame_step
+            bpy.context.scene.frame_start = start
+            bpy.context.scene.frame_end = end
+            bpy.context.scene.frame_step = step
+        else:
+            render_mode = 'image'
+
         if object is not None:
             current_world = self.camera.world
-            object._camera_view_active = True
+            if track:
+                object._camera_view_active = True
+            object._set_camera_view()
             self.camera.world = object.camera_world
-            self.camera.render(**kwargs)
+            self.camera.render(mode=render_mode, **kwargs)
             object._camera_view_active = False
             self.camera.world = current_world
         else:
-            self.camera.render(**kwargs)
+            self.camera.render(mode=render_mode, **kwargs)
         
+        if frame_range is not None:
+            bpy.context.scene.frame_start = old_start
+            bpy.context.scene.frame_end = old_end
+            bpy.context.scene.frame_step = old_step
+    
     @validate_properties
     def molecule(self,
                  universe: Union[AtomGroup, mda.Universe],
