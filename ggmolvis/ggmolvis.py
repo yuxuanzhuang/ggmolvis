@@ -40,13 +40,13 @@ from loguru import logger
 class GGMolVis(GGMolvisArtist):
     """Top level class that contains all the elements of the visualization.
     It is similar to a `Figure` in matplotlib. It contains all the
-    `Molecule`, `Shape`, `Text`, `Camera`, `Light`, and `World` objects.
+    `Molecule`, `Shape`, `Text`, `Light`, and `World` objects.
     It also contains the global settings for the visualization like
     `subframes`. It is a singleton class, so only one instance will be
     created in a session.
 
-    During initialization, it creates a global camera and a global world for
-    object transformation. The global camera is set to a default position
+    During initialization, it creates a camera and a global world for
+    object transformation. The camera is set to a default position
     and rotation. The global world transformation is set to no positional,
     rotational, or scaling transformation.
 
@@ -61,16 +61,14 @@ class GGMolVis(GGMolvisArtist):
         List of all `Shape` objects in the visualization
     texts: list
         List of all `Text` objects in the visualization
-    cameras: list
-        List of all `Camera` objects in the visualization
     lights: list
         List of all `Light` objects in the visualization
     worlds: list
         List of all `World` transformation objects in the visualization
     global_world: World
         The global world transformation object
-    global_camera: Camera
-        The global camera object
+    camera: Camera
+        The camera object
     subframes: int
         Number of subframes to render. It will be a global setting
         for all objects. Default is 0. For clarity, when subframes is set to `1`
@@ -80,9 +78,6 @@ class GGMolVis(GGMolvisArtist):
         Number of flanking frames to average over--this can help reduce
         "jittering" in movies. In contrast to `subframes`, no new frames
         are added. It will be a global setting for all objects. Default is 0.
-
-
-
     """
     def __new__(cls):
         if hasattr(SESSION, 'ggmolvis'):
@@ -95,7 +90,6 @@ class GGMolVis(GGMolvisArtist):
         instance._initialized = False
         return instance
     
-
     def __init__(self):
         if self._initialized:
             return
@@ -107,20 +101,19 @@ class GGMolVis(GGMolvisArtist):
             'molecules': [],
             'shapes': [],
             'texts': [],
-            'cameras': [Camera(name='global_camera')],
             'lights': [],
             'worlds': [World()]
         }
         self._global_world = self.worlds[0]
-        self._global_camera = self.cameras[0]
+        self._camera = Camera()
 
         self._subframes = 0
         self._average = 0
 
         # pre-defined camera position
-        bpy.data.collections.get('MolecularNodes').objects.link(self._global_camera.object)
-        self._global_camera.world.location._set_coordinates((0, -4, 1.3))
-        self._global_camera.world.rotation._set_coordinates((83, 0, 0))
+        bpy.data.collections.get('MolecularNodes').objects.link(self._camera.object)
+        self._camera.world.location._set_coordinates((0, -4, 1.3))
+        self._camera.world.rotation._set_coordinates((83, 0, 0))
 
         # set up the scene
         self._set_scene()
@@ -132,7 +125,7 @@ class GGMolVis(GGMolvisArtist):
         for artist in self._artists:
             artist._update_frame(frame_number)
 
-        self._global_camera.world._apply_to(self._global_camera.object, frame_number)
+        self._camera.world._apply_to(self._camera.object, frame_number)
 
     @property
     def _artists(self):
@@ -151,10 +144,6 @@ class GGMolVis(GGMolvisArtist):
         return self._artists_dict['texts']
     
     @property
-    def cameras(self):
-        return self._artists_dict['cameras']
-    
-    @property
     def lights(self):
         return self._artists_dict['lights']
     
@@ -167,8 +156,8 @@ class GGMolVis(GGMolvisArtist):
         return self._global_world
     
     @property
-    def global_camera(self):
-        return self._global_camera
+    def camera(self):
+        return self._camera
     
     @property
     def subframes(self):
@@ -198,6 +187,20 @@ class GGMolVis(GGMolvisArtist):
             bpy.context.scene.cycles.device = "GPU"
         except:
             pass
+    
+    def render(self,
+               object: SceneObject = None,
+               **kwargs):
+        """
+        Render the current scene.
+        """
+        if object is not None:
+            current_world = self.camera.world
+            self.camera.world = object.camera_world
+            self.camera.render(**kwargs)
+            self.camera.world = current_world
+        else:
+            self.camera.render(**kwargs)
         
     @validate_properties
     def molecule(self,
@@ -209,7 +212,7 @@ class GGMolVis(GGMolvisArtist):
                  scale: Union[np.ndarray, list] = None,
                  color='default',
                  material='default',
-                 lens: float = 24.0):
+                 ):
         """Create a `Molecule` object and add it to the visualization.
         
         Parameters:
@@ -230,8 +233,6 @@ class GGMolVis(GGMolvisArtist):
             The color of the molecule. Default is 'default'
         material: str
             The material of the molecule. Default is 'default'
-        lens: float
-            The focal length of the camera associated with the molecule.
 
         Returns:
         --------
@@ -246,7 +247,7 @@ class GGMolVis(GGMolvisArtist):
                             rotation=rotation,
                             scale=scale,
                             material=material,
-                            lens=lens)
+                            )
         self.molecules.append(molecule)
         return molecule
 

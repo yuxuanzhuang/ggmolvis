@@ -7,6 +7,8 @@ from ggmolvis.utils import MOL_AVAILABLE_STYLES, AVAILABLE_MATERIALS
 import pytest
 from pytest import fixture, mark
 
+import bpy
+
 @fixture(scope='module')
 def universe():
     return Universe(PSF, DCD)
@@ -29,9 +31,17 @@ def test_show_molecule(ggmolvis, atomgroup):
 def test_show_molecule_updating(ggmolvis, updating_atomgroup):
     ggmolvis.molecule(updating_atomgroup)
 
+def test_molecule_connected(ggmolvis, atomgroup):
+    ggmolvis.molecule(atomgroup)
+    # set frame to 1
+    bpy.context.scene.frame_set(5)
+    print(ggmolvis.session)
+    assert atomgroup.universe.trajectory.frame == 5
+
 @mark.parametrize('material', AVAILABLE_MATERIALS)
 def test_show_molecule_with_material(ggmolvis, atomgroup, material):
     ggmolvis.molecule(atomgroup, material=material)
+
 
 @pytest.mark.parametrize('style', MOL_AVAILABLE_STYLES)
 def test_show_molecule_with_style(ggmolvis, atomgroup, style):

@@ -30,13 +30,11 @@ class Molecule(SceneObject):
         color="black",
         material="default",
         style: str = "spheres",
-        lens: float = 24.0,
     ):
         """Show the molecule."""
 
         self.atomgroup = atomgroup
         self.universe = atomgroup.universe
-        self.lens = lens
 
         # molecules need style name to create object
         self._style_name = style
@@ -49,7 +47,6 @@ class Molecule(SceneObject):
             color=color,
             material=material,
             style=style,
-            lens=lens,
         )
 
     def _init_style(self, style="default"):
