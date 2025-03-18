@@ -93,29 +93,26 @@ class Camera(GGMolvisArtist):
         self.world.location = location
         self.world.rotation = rotation
     
-    def _move_to_collection(self, name):
-        """Move the object to the collection with the same name"""
-        coll_obj = coll.mn().children.get(name)
-        coll_obj.objects.link(self.object)
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        del state['camera']
-        return state
-    
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-        self.camera = bpy.data.cameras[state['name']]
-        self._set_property()
-
     def render(self,
                mode='image',
+               lens=None,
+               clip_start=None,
+               clip_end=None,
                frame=None,
                filepath=None,
                resolution=(640, 360),
                composite_bg_rgba=None):
         """Render the scene with this camera"""
         bpy.context.scene.camera = self.object
+        if lens is not None:
+            old_lens = self.lens
+            self.lens = lens
+        if clip_start is not None:
+            old_clip_start = self.clip_start
+            self.clip_start = clip_start
+        if clip_end is not None:
+            old_clip_end = self.clip_end
+            self.clip_end = clip_end
         if frame is not None:
             bpy.context.scene.frame_set(frame)
 
@@ -130,3 +127,10 @@ class Camera(GGMolvisArtist):
                             filepath=filepath)
         renderer.render()
         renderer.display_in_notebook()
+
+        if lens is not None:
+            self.lens = old_lens
+        if clip_start is not None:
+            self.clip_start = old_clip_start
+        if clip_end is not None:
+            self.clip_end = old_clip_end
