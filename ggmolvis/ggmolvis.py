@@ -111,7 +111,6 @@ class GGMolVis(GGMolvisArtist):
         self._average = 0
 
         # pre-defined camera position
-        bpy.data.collections.get('MolecularNodes').objects.link(self._camera.object)
         self._camera.world.location._set_coordinates((0, -4, 1.3))
         self._camera.world.rotation._set_coordinates((83, 0, 0))
 
@@ -300,7 +299,7 @@ class GGMolVis(GGMolvisArtist):
                     material=line_material)
         self.shapes.append(line)
         self.molecules.append(mol_atoms)
-        return line
+        return mol_atoms, line
         
         
     @validate_properties
