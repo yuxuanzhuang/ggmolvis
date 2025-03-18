@@ -241,7 +241,9 @@ class GGMolVis(GGMolvisArtist):
         molecule: Molecule
             The created `Molecule` object
         """
-        molecule = Molecule(atomgroup=universe.atoms,
+        if isinstance(universe, mda.Universe):
+            universe = universe.atoms
+        molecule = Molecule(atomgroup=universe,
                             style=style,
                             name=name,
                             color=color,
