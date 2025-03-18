@@ -196,8 +196,10 @@ class GGMolVis(GGMolvisArtist):
         """
         if object is not None:
             current_world = self.camera.world
+            object._camera_view_active = True
             self.camera.world = object.camera_world
             self.camera.render(**kwargs)
+            object._camera_view_active = False
             self.camera.world = current_world
         else:
             self.camera.render(**kwargs)

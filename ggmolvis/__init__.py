@@ -57,6 +57,11 @@ with suppress_blender_output():
 # update every artist when the frame changes
 @persistent
 def update_frame(scene):
+    # This is necessary to e.g. get the correct object
+    # dimensions after frame change during rendering
+    # see: https://blender.stackexchange.com/questions/61635/object-dimensions-changing-but-not-changing
+    bpy.context.view_layer.update() 
+    
     for artist in SESSION._ggmolvis:
         artist._update_frame(scene.frame_current)
 

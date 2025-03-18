@@ -13,7 +13,7 @@ class RMSDVisualizer(Visualizer):
                                         color='default',
                                         name='rmsd')
 
-        self._camera = mobile_molecule.camera
+        self._camera_world = mobile_molecule.camera_world
 
         if not analysis.results:
             analysis.run()
@@ -23,5 +23,5 @@ class RMSDVisualizer(Visualizer):
         return ggmv
 
     @property
-    def camera(self):
-        return self._camera
+    def camera_world(self):
+        return self._camera_world

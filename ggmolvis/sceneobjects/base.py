@@ -20,6 +20,7 @@ from ..camera import Camera
 from ..properties import Color, Material, Style
 from ..utils import look_at
 
+from loguru import logger
 
 class SceneObject(GGMolvisArtist):
     """Class for the scene object.
@@ -58,7 +59,7 @@ class SceneObject(GGMolvisArtist):
         self.world._apply_to(self.object)
 
         self.camera_world = World()
-        self._set_camera()
+        self._camera_view_active = False
 
         self.draw()
         self._update_frame(bpy.context.scene.frame_current)
@@ -76,6 +77,10 @@ class SceneObject(GGMolvisArtist):
         """
         Set camera information based on the object.
         """
+        # only run if the camera view is active
+        # to avoid unnecessary calculations
+        if not self._camera_view_active:
+            return
         size_obj_xyz = np.array(self.object.dimensions)
         # center of the object
         center_xyz = np.zeros(3)
@@ -96,6 +101,7 @@ class SceneObject(GGMolvisArtist):
         )
 
         camera_degree = np.rad2deg(list(rot.to_euler()))
+
         self.camera_world.location.coordinates = camera_center
         self.camera_world.rotation.coordinates = camera_degree
 
