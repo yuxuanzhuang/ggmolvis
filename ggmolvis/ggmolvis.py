@@ -200,9 +200,17 @@ class GGMolVis(GGMolvisArtist):
             raise ValueError("Both frame and frame_range cannot be set")
         if frame is not None:
             render_mode = 'image'
+            if kwargs.get('mode', None) == 'movie':
+                logger.warning("mode is set to 'movie' but frame is set. "
+                        "Changing mode to 'image'")
+            kwargs['mode'] = 'image'
             bpy.context.scene.frame_set(frame)
         elif frame_range is not None:
             render_mode = 'movie'
+            if kwargs.get('mode', None) == 'image':
+                logger.warning("mode is set to 'image' but frame_range is set. "
+                        "Changing mode to 'movie'")
+            kwargs['mode'] = 'movie'
             if len(frame_range) != 3:
                 raise ValueError("frame_range must be a tuple of 3 integers (start, end, step)")
             start, end, step = frame_range
@@ -213,7 +221,8 @@ class GGMolVis(GGMolvisArtist):
             bpy.context.scene.frame_end = end
             bpy.context.scene.frame_step = step
         else:
-            render_mode = 'image'
+            render_mode = kwargs.pop('mode', 'image')
+        kwargs['mode'] = render_mode
 
         if object is not None:
             current_world = self.camera.world
@@ -221,11 +230,11 @@ class GGMolVis(GGMolvisArtist):
                 object._camera_view_active = True
             object._set_camera_view()
             self.camera.world = object.camera_world
-            self.camera.render(mode=render_mode, **kwargs)
+            self.camera.render(**kwargs)
             object._camera_view_active = False
             self.camera.world = current_world
         else:
-            self.camera.render(mode=render_mode, **kwargs)
+            self.camera.render(**kwargs)
         
         if frame_range is not None:
             bpy.context.scene.frame_start = old_start
