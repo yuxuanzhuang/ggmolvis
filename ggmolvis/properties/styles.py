@@ -30,8 +30,8 @@ class Style(Property):
         pass
 
 
-class MoleculeStyle(Style):
-    """Style explicitly for Molecules"""
+class TrajectoryStyle(Style):
+    """Style explicitly for Trajectory"""
 
     AVAILABLE_STYLES = MOL_AVAILABLE_STYLES
 

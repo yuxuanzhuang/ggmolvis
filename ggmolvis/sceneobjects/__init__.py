@@ -1,4 +1,4 @@
 from .base import SceneObject
 from .shapes import Shape, Line
-from .molecules import Molecule
+from .trajectories import Trajectory
 from .texts import Text

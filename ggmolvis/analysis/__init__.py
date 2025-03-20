@@ -28,8 +28,8 @@ def _visualize_atom(self,
     Visualize atoms function
     """
     ggmv = GGMolVis()
-    # create a molecule object for the mobile atoms
-    mol_vis = ggmv.molecule(self.atoms, **kwargs)
+    # create a trajectory object for the mobile atoms
+    mol_vis = ggmv.trajectory(self.atoms, **kwargs)
     if render:
         ggmv.render(mol_vis)
     return mol_vis

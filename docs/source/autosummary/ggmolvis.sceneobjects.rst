@@ -11,6 +11,6 @@ ggmolvis.sceneobjects
    :recursive:
 
    base
-   molecules
+   trajectories
    shapes
    texts
