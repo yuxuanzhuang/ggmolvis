@@ -57,8 +57,8 @@ class Molecule(SceneObject):
     def _init_style(self, style="default"):
         self._style = MoleculeStyle(self, style)
 
-    def _init_material(self, material="default"):
-        self._material = MoleculeMaterial(self, material)
+    def _init_material(self, material="default", color=None):
+        self._material = MoleculeMaterial(self, material, color=color)
 
     def _init_color(self, color="black"):
         self._color = MoleculeColor(self, color)
