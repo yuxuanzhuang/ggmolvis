@@ -22,7 +22,7 @@ class Molecule(SceneObject):
     """Class for a molecule."""
     def __init__(
         self,
-        atomgroup: mda.AtomGroup,
+        atomgroup: Union[mda.AtomGroup, mda.Universe],
         name: str = "atoms",
         location=None,
         rotation=None,
@@ -30,13 +30,16 @@ class Molecule(SceneObject):
         color="black",
         material="default",
         style: str = "spheres",
-        lens: float = 24.0,
     ):
         """Show the molecule."""
-
-        self.atomgroup = atomgroup
-        self.universe = atomgroup.universe
-        self.lens = lens
+        if isinstance(atomgroup, mda.Universe):
+            self.atomgroup = atomgroup.atoms
+            self.universe = atomgroup
+        elif isinstance(atomgroup, mda.AtomGroup):
+            self.atomgroup = atomgroup
+            self.universe = atomgroup.universe
+        else:
+            raise TypeError("atomgroup must be an AtomGroup or Universe")
 
         # molecules need style name to create object
         self._style_name = style
@@ -49,7 +52,6 @@ class Molecule(SceneObject):
             color=color,
             material=material,
             style=style,
-            lens=lens,
         )
 
     def _init_style(self, style="default"):

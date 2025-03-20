@@ -20,14 +20,13 @@ class TestGGMolVis(unittest.TestCase):
         vis = GGMolVis()
 
         # Check if the global camera and world are set up correctly
-        self.assertIsInstance(vis.global_camera, Camera)
+        self.assertIsInstance(vis.camera, Camera)
         self.assertIsInstance(vis.global_world, World)
 
         # Check if the artists dictionary is populated with default values
         self.assertIn('molecules', vis._artists_dict)
         self.assertIn('shapes', vis._artists_dict)
         self.assertIn('texts', vis._artists_dict)
-        self.assertIn('cameras', vis._artists_dict)
         self.assertIn('lights', vis._artists_dict)
         self.assertIn('worlds', vis._artists_dict)
 
