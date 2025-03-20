@@ -108,3 +108,12 @@ class Trajectory(SceneObject):
     @property
     def trajectory(self):
         return self._trajectory
+
+    @property
+    def n_frames(self):
+        return self.universe.trajectory.n_frames
+    
+    @property
+    def frame(self):
+        return self.universe.trajectory.frame
+    
