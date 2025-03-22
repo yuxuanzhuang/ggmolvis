@@ -12,8 +12,9 @@ sphinx:
 
 python:
   install:
-    - method: pip --no-dependencies
+    - method: pip
       path: .
+      extra_requirements: []
 
 conda:
   environment: docs/requirements.yaml
