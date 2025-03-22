@@ -79,7 +79,7 @@ class Material(Property):
         self._material_modifier.update(value)
 
 
-class MoleculeMaterial(Material):
+class TrajectoryMaterial(Material):
     def _apply_to(self, obj, frame: int = 0):
         """Apply material to the object."""
 

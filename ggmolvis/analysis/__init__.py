@@ -12,10 +12,11 @@ def _visualize_analysis(self,
     Create a visualizer object based on the analysis class
     e.g. if self is RMSD, then the visualizer object will be RMSDVisualizer
     """
+    ggmv = GGMolVis()
     visualizer = Visualizer.from_analysis(self, **kwargs)
     visualizer._visualize()
     if render:
-        visualizer.render()
+        ggmv.render(visualizer)
     return visualizer
 
 AnalysisBase.visualize = _visualize_analysis
@@ -27,10 +28,10 @@ def _visualize_atom(self,
     Visualize atoms function
     """
     ggmv = GGMolVis()
-    # create a molecule object for the mobile atoms
-    mol_vis = ggmv.molecule(self.atoms, **kwargs)
+    # create a trajectory object for the mobile atoms
+    mol_vis = ggmv.trajectory(self.atoms, **kwargs)
     if render:
-        mol_vis.render()
+        ggmv.render(mol_vis)
     return mol_vis
 
 GroupBase.visualize = _visualize_atom

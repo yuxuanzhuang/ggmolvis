@@ -9,5 +9,5 @@ ggmolvis.properties.materials
    .. autosummary::
    
       Material
-      MoleculeMaterial
+      TrajectoryMaterial
    

@@ -25,5 +25,5 @@ dependencies:
 
   # Pip-only installs
   - pip:
-    - git+https://github.com/BradyAJohnston/MolecularNodes.git@v4.2.9
+    - git+https://github.com/BradyAJohnston/MolecularNodes.git@main
     - bpy

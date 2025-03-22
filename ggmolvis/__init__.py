@@ -8,7 +8,7 @@ import shutil
 import tempfile
 from importlib.metadata import version
 import bpy
-from bpy.app.handlers import frame_change_post
+from bpy.app.handlers import frame_change_pre
 from bpy.app.handlers import persistent
 import molecularnodes as mn
 from ggmolvis.utils import suppress_blender_output
@@ -57,10 +57,15 @@ with suppress_blender_output():
 # update every artist when the frame changes
 @persistent
 def update_frame(scene):
+    # This is necessary to e.g. get the correct object
+    # dimensions after frame change during rendering
+    # see: https://blender.stackexchange.com/questions/61635/object-dimensions-changing-but-not-changing
+    bpy.context.view_layer.update() 
+    
     for artist in SESSION._ggmolvis:
         artist._update_frame(scene.frame_current)
 
-frame_change_post.append(update_frame)
+frame_change_pre.append(update_frame)
 
 # add visualize function to AnalysisBase and GroupBase so that
 # AtomGroup and ResidueGroup can be visualized with `.visualize()`
@@ -73,7 +78,7 @@ def cleanup_function():
 #    print("Saving the current session to", dest_path)
 #    bpy.ops.wm.save_as_mainfile(filepath=dest_path)
     from molecularnodes import unregister
-    frame_change_post.remove(update_frame)
+    frame_change_pre.remove(update_frame)
     try:
         unregister()
     except Exception as e:

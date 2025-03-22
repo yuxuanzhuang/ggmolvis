@@ -21,13 +21,16 @@ class Visualizer(GGMolvisArtist):
         pass
 
     @property
-    def camera(self):
-        return self._camera
+    def camera_world(self):
+        return self._camera_world
     
     def render(self, **kwargs):
         # set the render movie end frame to the number of frames in the trajectory
         bpy.context.scene.frame_end = self.analysis.atomgroup.universe.trajectory.n_frames
-        self.camera.render(**kwargs)
+        self.ggmolvis.render(object=self, **kwargs)
+    
+    def _set_camera_view(self):
+        raise NotImplementedError("This method is only available in the subclass")
 
 
 AVAILABLE_VISUALIZERS = {}

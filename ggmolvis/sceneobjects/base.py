@@ -20,6 +20,7 @@ from ..camera import Camera
 from ..properties import Color, Material, Style
 from ..utils import look_at
 
+from loguru import logger
 
 class SceneObject(GGMolvisArtist):
     """Class for the scene object.
@@ -27,10 +28,7 @@ class SceneObject(GGMolvisArtist):
     Access the blender object using the object property, `self.object`.
     The name might be different from the initial name, as Blender might
     append a number to the name if the name already exists.
-
-
     """
-
     def __init__(
         self,
         name=None,
@@ -46,6 +44,7 @@ class SceneObject(GGMolvisArtist):
         self.name = name
 
         self._subframes = 0
+        self._average = 0
 
         # Create the object
         obj = self._create_object()
@@ -58,8 +57,10 @@ class SceneObject(GGMolvisArtist):
         self._init_style(style)
 
         self.world._apply_to(self.object)
-        self._init_camera()
-        self._move_to_collection()
+
+        self.camera_world = World()
+        self._set_camera_view()
+        self._camera_view_active = False
 
         self.draw()
         self._update_frame(bpy.context.scene.frame_current)
@@ -73,8 +74,13 @@ class SceneObject(GGMolvisArtist):
     def _init_style(self, style="default"):
         self._style = Style(self, style)
 
-    def _init_camera(self):
-        self.camera = Camera(name=f"{self.name}_camera")
+    def _set_camera_view(self):
+        """
+        Set camera view based on the object.
+        # TODO: this is way to janky, needs to be improved
+        """
+        # only run if the camera view is active
+        # to avoid unnecessary calculations
         size_obj_xyz = np.array(self.object.dimensions)
         # center of the object
         center_xyz = np.zeros(3)
@@ -94,29 +100,18 @@ class SceneObject(GGMolvisArtist):
             camera_position=camera_center, target_position=center_xyz
         )
 
-        self.camera.world.location._set_coordinates(camera_center)
-        self.camera.world.rotation._set_coordinates(np.rad2deg(list(rot.to_euler())))
+        camera_degree = np.rad2deg(list(rot.to_euler()))
 
-    def _move_to_collection(self):
-        """Move the object to the collection with the same name"""
-        mn_coll = bpy.data.collections.get('MolecularNodes')
-        coll = mn_coll.children.get(self.name)
-        if coll is None:
-            coll = bpy.data.collections.new(self.name)
-            mn_coll.children.link(coll)
-        coll.objects.link(self.object)
-        mn_coll.objects.unlink(self.object)
-        self.camera._move_to_collection(self.name)
-
+        self.camera_world.location.coordinates = camera_center
+        self.camera_world.rotation.coordinates = camera_degree
 
     def _update_frame(self, frame):
         object = self.object
         self.material._apply_to(object, frame)
         self.color._apply_to(object, frame)
         self.world._apply_to(object, frame)
-
-        camera = self.camera
-        camera._update_frame(frame)
+        if self._camera_view_active:
+            self._set_camera_view()
 
     @abstractmethod
     def _create_object(self):
@@ -163,7 +158,13 @@ class SceneObject(GGMolvisArtist):
         self.color._apply_to(self.object)
 
     def render(self, **kwargs):
-        self.camera.render(**kwargs)
+        """
+        Render the object with the corresponding
+        camera settings.
+        """
+        self.ggmolvis.render(
+            object=self,
+            **kwargs)
 
     @property
     def color(self):

@@ -32,8 +32,8 @@ class Color(Property):
         self.colors = self.colormap(norm(values))
 
 
-class MoleculeColor(Color):
-    """Class for the molecule color."""
+class TrajectoryColor(Color):
+    """Class for the trajectory color."""
 
     def _apply_to(self, obj, frame: int = 0):
         """Apply color to the MN object."""
