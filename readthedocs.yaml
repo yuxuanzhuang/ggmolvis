@@ -12,7 +12,7 @@ sphinx:
 
 python:
   install:
-    - method: pip
+    - method: pip --no-dependencies
       path: .
 
 conda:
