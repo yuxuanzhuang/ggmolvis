@@ -153,22 +153,3 @@ jobs:
           test -n "${DISTRIBUTION}" || { echo "no distribution dist/ggmolvis-*.tar.gz found"; exit 1; }
           echo "twine check $DISTRIBUTION"
           twine check $DISTRIBUTION
-
-  docs:
-    if: "github.repository == 'yuxuanzhuang/ggmolvis'"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          pip install -r docs/requirements.txt
-
-      - name: Build docs
-        run: |
-          python -m sphinx -T -b html -d _build/doctrees -D language=en . ${{ github.workspace }}/docs/_build/html
