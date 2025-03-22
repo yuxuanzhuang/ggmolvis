@@ -12,5 +12,8 @@ sphinx:
 
 python:
   install:
-    - path: .
-    - requirements: docs/requirements.yaml
+    - method: pip
+      path: .
+
+conda:
+  environment: docs/requirements.yaml
