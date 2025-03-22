@@ -85,7 +85,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -n 2 -v --cov=ggmolvis --cov-report=xml --color=yes ggmolvis/tests/ || true
+          pytest -n 2 -v --cov=ggmolvis --cov-report=xml --color=yes ggmolvis/tests/
           exit_code=$?
           if [ $exit_code -eq 139 ]; then
               echo "Segmentation fault occurred. Ignoring and continuing CI."
@@ -204,7 +204,7 @@ jobs:
 #        if: github.event_name == 'pull_request'
         continue-on-error: true
         run: |
-          sphinx-build --keep-going ./docs/source ./docs/_build/html || true
+          sphinx-build --keep-going ./docs/source ./docs/_build/html
 
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.5.4
