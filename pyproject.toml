@@ -19,7 +19,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "MDAnalysis>=2.7.0",
-    "molecularnodes @ git+https://github.com/BradyAJohnston/MolecularNodes.git@v4.2.12",
+    "molecularnodes @ git+https://github.com/BradyAJohnston/MolecularNodes.git@main",
     "pydantic",
     "jupyter",
     "loguru",

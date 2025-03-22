@@ -1,20 +1,20 @@
-# readthedocs.yaml
+# .readthedocs.yaml
 
 version: 2
 
 build:
   os: ubuntu-22.04
   tools:
-    python: "mambaforge-22.9"
+    python: "mambaforge-4.10"
 
-conda:
-  environment: docs/requirements.yaml
+sphinx:
+  configuration: docs/source/conf.py
 
 python:
   install:
     - method: pip
       path: .
+      extra_requirements: []
 
-build:
-  commands:
-    - python -m sphinx -T -b html -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html || true
+conda:
+  environment: docs/requirements.yaml
