@@ -7,21 +7,31 @@ class RMSDVisualizer(Visualizer):
         analysis = self.analysis
         mobile_atoms = analysis.mobile_atoms
         ggmv = GGMolVis()
-        # create a molecule object for the mobile atoms
-        mobile_molecule = ggmv.molecule(mobile_atoms,
+        # create a trajectory object for the mobile atoms
+        mobile_mol = ggmv.trajectory(mobile_atoms,
                                         style='cartoon',
                                         color='default',
                                         name='rmsd')
-
-        self._camera = mobile_molecule.camera
+        self.mobile_mol = mobile_mol
 
         if not analysis.results:
             analysis.run()
         rmsd_results = analysis.results['rmsd'].T[2]
-        mobile_molecule.color.set_map(values=rmsd_results, cmap='coolwarm')
+        mobile_mol.color.set_map(values=rmsd_results, cmap='coolwarm')
 
-        return ggmv
-
+        return self
+    
     @property
-    def camera(self):
-        return self._camera
+    def camera_world(self):
+        return self.mobile_mol.camera_world
+    
+    @property
+    def _camera_view_active(self):
+        return self.mobile_mol._camera_view_active
+    
+    @_camera_view_active.setter
+    def _camera_view_active(self, value):
+        self.mobile_mol._camera_view_active = value
+    
+    def _set_camera_view(self):
+        self.mobile_mol._set_camera_view()

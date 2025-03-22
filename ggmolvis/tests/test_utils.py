@@ -1,7 +1,6 @@
 from ggmolvis.utils import lerp
 import numpy as np
 
-
 def test_lerp():
     assert lerp(1, 2, 0.5) == 1.5
     assert lerp(1, 2, 0.3) == 1.3

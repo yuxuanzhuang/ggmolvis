@@ -1,12 +1,12 @@
-ggmolvis.sceneobjects.molecules
+ggmolvis.sceneobjects.trajectories
 ===============================
 
-.. automodule:: ggmolvis.sceneobjects.molecules
+.. automodule:: ggmolvis.sceneobjects.trajectories
 
    
    .. rubric:: Classes
 
    .. autosummary::
    
-      Molecule
+      Trajectory
    

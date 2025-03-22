@@ -8,6 +8,6 @@ ggmolvis.properties.styles
 
    .. autosummary::
    
-      MoleculeStyle
+      TrajectoryStyle
       Style
    

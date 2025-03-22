@@ -9,5 +9,5 @@ ggmolvis.properties.colors
    .. autosummary::
    
       Color
-      MoleculeColor
+      TrajectoryColor
    

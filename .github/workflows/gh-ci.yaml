@@ -27,7 +27,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         mdanalysis-version: ["latest", "develop"]
-        molecular-nodes-version: ["main", "v4.2.9", "v4.2.10"]
+        molecular-nodes-version: ["main", "v4.2.12"]
         python-version: ["3.11"]
         exclude:
           # Temporarily skip Windows with "latest" MDAnalysis version
@@ -85,7 +85,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -n 2 -v --cov=ggmolvis --cov-report=xml --color=yes ggmolvis/tests/ || true
+          pytest -n 2 -v --cov=ggmolvis --cov-report=xml --durations=50 --color=yes ggmolvis/tests/
           exit_code=$?
           if [ $exit_code -eq 139 ]; then
               echo "Segmentation fault occurred. Ignoring and continuing CI."
@@ -153,119 +153,3 @@ jobs:
           test -n "${DISTRIBUTION}" || { echo "no distribution dist/ggmolvis-*.tar.gz found"; exit 1; }
           echo "twine check $DISTRIBUTION"
           twine check $DISTRIBUTION
-
-  build_docs:
-    if: "github.repository == 'yuxuanzhuang/ggmolvis'"
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      CYTHON_TRACE_NOGIL: 1
-      MPLBACKEND: agg
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Build information
-        run: |
-          uname -a
-          df -h
-          ulimit -a
-
-      - name: Install conda dependencies
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          python-version: "3.11"
-          environment-file: docs/requirements.yaml
-          add-pip-as-python-dependency: true
-          miniforge-variant: Miniforge3
-          use-mamba: true
-          channels: conda-forge, defaults
-          activate-environment: ggmolvis-docs
-          auto-update-conda: true
-          auto-activate-base: false
-          show-channel-urls: true
-
-      - name: Install package
-        run: |
-          python --version
-          python -m pip install . --no-deps
-
-      - name: Python information
-        run: |
-          which python
-          which pip
-          pip list
-          conda info
-          conda list
-
-      - name: build docs with sphinx
-#        if: github.event_name == 'pull_request'
-        continue-on-error: true
-        run: |
-          sphinx-build --keep-going ./docs/source ./docs/_build/html || true
-
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_KEY_PRIVATE }}
-
-      - name: Clone Pages Repo using SSH
-        run: |
-          # Set folder name based on event type
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            export FOLDER_NAME="main"
-          else
-            export FOLDER_NAME="latest"
-          fi
-
-          # Get version and branch details
-          python devtools/write_version.py || true
-          export VERSION=$(cat VERSION.txt)
-          echo "VERSION: $VERSION"
-          BRANCH="${GITHUB_REF#refs/heads/}"
-          echo "Branch: $BRANCH"
-
-          # Move built docs into versioned folder
-          cd docs/_build/html
-          mkdir -p ../${VERSION}
-          mv * ../${VERSION}
-          mv ../${VERSION} $VERSION
-
-          # Get Git revision hash
-          REV=$(git rev-parse --short HEAD)
-          echo "Git Revision: $REV"
-
-          # Initialize and configure Git
-          git init
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git remote add upstream "git@github.com:yuxuanzhuang/ggmolvis.github.io.git"
-          git fetch --depth 50 upstream gh-pages
-          git reset upstream/gh-pages
-
-          # Create redirects and copies
-          mkdir -p ${FOLDER_NAME}
-          cp -r ${VERSION}/* ${FOLDER_NAME}/
-          touch .nojekyll
-          cp ../../../devtools/index.html .
-
-          # Add changes to Git
-          git add -A ${VERSION}/
-          git add -A ${FOLDER_NAME}/
-          git add .nojekyll *.html index.html
-
-          # Add additional directories if they exist
-          for dirname in dev stable documentation_pages; do
-            if [ -d "$dirname" ]; then
-              git add "$dirname"
-            fi
-          done
-
-          # Check for uncommitted changes and commit
-          git diff-index --quiet HEAD -- || \
-            git commit -m "Rebuilt HTML docs for version ${VERSION} from branch ${BRANCH} with Sphinx at ${REV}"
-
-          # Push changes to upstream gh-pages branch
-          git push -q upstream HEAD:gh-pages
