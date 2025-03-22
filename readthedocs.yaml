@@ -15,4 +15,4 @@ python:
     - method: pip
       path: .
     - method: pip
-      url: git+https://github.com/BradyAJohnston/MolecularNodes.git@main
+      url: git+https://github.com/BradyAJohnston/MolecularNodes.git
