@@ -85,7 +85,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -n 2 -v --cov=ggmolvis --cov-report=xml --color=yes ggmolvis/tests/
+          pytest -n 2 -v --cov=ggmolvis --cov-report=xml --durations=50 --color=yes ggmolvis/tests/
           exit_code=$?
           if [ $exit_code -eq 139 ]; then
               echo "Segmentation fault occurred. Ignoring and continuing CI."
