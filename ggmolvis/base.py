@@ -137,6 +137,15 @@ class GGMolvisArtist(ABC):
     @average.setter
     def average(self, value):
         self.ggmolvis.average = value
+    
+    @property
+    def frame(self):
+        """Return the current frame
+        For subclasses, this can be used to present the object's frame.
+        e.g. for `Trajectory` object, it can be used to present the current
+        frame of the trajectory.
+        """
+        return bpy.context.scene.frame_current
 
     def _remove(self):
         """Remove the object from the session"""
