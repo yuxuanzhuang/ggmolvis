@@ -7,26 +7,43 @@ from ..utils import materials_mapping, AVAILABLE_MATERIALS
 
 class Material(Property):
     """Class for the material."""
-#    _material_modifier = {}
+    _material_modifier = {}
 
     def _set_property(self):
-        self._material_modifier = {}
-        material_name = self.property_name
-        if material_name is None:
-            material_name = "backdrop"
+        """Sets the material property and ensures it's valid."""
+        material_name = self.property_name or "backdrop"
 
         if material_name not in AVAILABLE_MATERIALS:
             raise ValueError(
-                f"Material {material_name} is not available."
+                f"Material {material_name} is not available. "
                 f"Available materials are {AVAILABLE_MATERIALS}"
             )
 
-        # create a material copy
-        default_material = bpy.data.materials[materials_mapping[material_name]]
-        self.material = default_material.copy()
-        self.material.name = f"{self.name}"
+        # Create a material copy
+        default_material = bpy.data.materials.get(materials_mapping.get(material_name))
+        if default_material is None:
+            raise ValueError(f"Material mapping for {material_name} not found.")
 
-        self.material_name = self.material.name
+        material_copied = default_material.copy()
+        material_copied.name = f"{self.name}"
+        self.material_name = material_copied.name
+
+    @property
+    def material(self):
+        """Return the material, handling missing cases gracefully."""
+        # Attempt to retrieve from Blender if not stored in memory
+        if hasattr(self, "material_name") and self.material_name in bpy.data.materials:
+            return bpy.data.materials[self.material_name]
+
+        return None  # Material is not set
+
+    @material.setter
+    def material(self, material: bpy.types.Material):
+        """Set the material and update material_name."""
+        if not isinstance(material, bpy.types.Material):
+            raise TypeError("Assigned material must be a Blender Material.")
+        self.material_name = material.name
+
 
     def set_material(self, material_name):
         self.property_name = material_name
@@ -61,15 +78,6 @@ class Material(Property):
             "with the key as property name and value as the modifier.")
         self._material_modifier.update(value)
 
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        del state["material"]
-        return state
-
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-        self._set_property()
-    
 
 class TrajectoryMaterial(Material):
     def _apply_to(self, obj, frame: int = 0):

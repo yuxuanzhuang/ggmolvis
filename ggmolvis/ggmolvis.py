@@ -153,10 +153,16 @@ class GGMolVis(GGMolvisArtist):
 
     @property
     def global_world(self):
+        if not hasattr(self, '_global_world'):
+            self._global_world = World()
         return self._global_world
     
     @property
     def camera(self):
+        if not hasattr(self, '_camera'):
+            self._camera = Camera()
+            self._camera.world.location._set_coordinates((0, -4, 1.3))
+            self._camera.world.rotation._set_coordinates((83, 0, 0))
         return self._camera
     
     @property

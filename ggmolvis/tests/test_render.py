@@ -6,8 +6,21 @@ from ggmolvis.utils import MOL_AVAILABLE_STYLES, AVAILABLE_MATERIALS
 
 import pytest
 from pytest import fixture, mark
+from .utils import cleanup
 
 import bpy
+from loguru import logger
+
+@pytest.fixture
+def render_png(request, tmp_path_factory):
+    module_tmp_path = tmp_path_factory.mktemp("render")
+    return str(module_tmp_path / f"{request.node.name}.png")
+
+@pytest.fixture
+def render_mp4(request, tmp_path_factory):
+    module_tmp_path = tmp_path_factory.mktemp("render")
+    logger.info(f"MP4: {module_tmp_path}")
+    return str(module_tmp_path / f"{request.node.name}.mp4")
 
 @fixture(scope='module')
 def universe():
@@ -15,34 +28,51 @@ def universe():
 
 @fixture(scope='module')
 def atomgroup(universe):
-    return universe.select_atoms('protein')
+    return universe.select_atoms('resid 40 127')
 
-@fixture(scope='module')
-def ggmolvis(universe):
-    return GGMolVis()
-
-def test_render_scene(ggmolvis, atomgroup):
-    mol = ggmolvis.trajectory(atomgroup)
-    ggmolvis.render()
+@cleanup
+def test_render_scene(ggmv, atomgroup, render_png):
+    mol = ggmv.trajectory(atomgroup)
+    logger.info(f"PNG: {render_png}")
+    ggmv.render(filepath=render_png, resolution=(300, 200))
 
 # add test for rendering
-render_options = [
-    {'frame': 0, },
-    {'frame_range': (0, 4, 1)},
-    {'track': True},
+render_image_options = [
+    {'frame': 0},
+    {'frame': 60},
 ]
-
-@mark.parametrize('render_options', render_options)
-def test_render(ggmolvis, atomgroup, render_options):
-    mol = ggmolvis.trajectory(atomgroup)
-    ggmolvis.render(mol, **render_options,
+@cleanup
+@mark.parametrize('render_image_options', render_image_options)
+def test_render_png(ggmv, atomgroup, render_image_options, render_png):
+    mol = ggmv.trajectory(atomgroup)
+    logger.info(f"PNG: {render_png}")
+    ggmv.render(mol, **render_image_options,
                     resolution=(300, 200),
-                    )
+                    filepath=render_png)
 
-def test_render_error_frame_range(ggmolvis, atomgroup):
-    mol = ggmolvis.trajectory(atomgroup)
+render_mp4_options = [
+    {'frame_range': (0, 60, 10)},
+    {'frame_range': (0, 60, 10), 'track': True},
+]
+@cleanup
+@mark.parametrize('render_mp4_options', render_mp4_options)
+def test_render_mp4(ggmv, atomgroup, render_mp4_options, render_mp4):
+    mol = ggmv.trajectory(atomgroup)
+    logger.info(f"MP4: {render_mp4}")
+    ggmv.render(mol, **render_mp4_options,
+                resolution=(300, 200),
+                filepath=render_mp4)
+
+
+@cleanup
+def test_render_error_frame_range(ggmv, atomgroup, render_mp4):
+    mol = ggmv.trajectory(atomgroup)
     with pytest.raises(ValueError):
-        ggmolvis.render(mol, frame=0, frame_range=(0, 4, 1))
+        ggmv.render(mol, frame=0, frame_range=(0, 4, 1),
+                        resolution=(300, 200),
+                        filepath=render_mp4)
     
     with pytest.raises(ValueError, match='frame_range must be'):
-        ggmolvis.render(mol, frame_range=(0, 4))
+        ggmv.render(mol, frame_range=(0, 4),
+                        resolution=(300, 200),
+                        filepath=render_mp4)
