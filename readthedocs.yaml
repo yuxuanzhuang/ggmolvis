@@ -15,4 +15,4 @@ python:
     - method: pip
       path: .
     - method: pip
-      path: git+https://github.com/BradyAJohnston/MolecularNodes.git
+      requirements: docs/requirements.yaml
