@@ -15,6 +15,7 @@ Classes
 """
 import bpy
 from abc import ABC, abstractmethod
+import functools
 import molecularnodes as mn
 from molecularnodes.entities.trajectory import Trajectory
 from molecularnodes.entities.trajectory.selections import Selection
@@ -31,7 +32,7 @@ from .world import World
 from .camera import Camera
 from .light import Light
 from .properties import Color, Material
-from .sceneobjects import SceneObject, Text, Molecule, Shape, Line
+from .sceneobjects import SceneObject, Text, Trajectory, Shape, Line
 from .utils import validate_properties
 
 from loguru import logger
@@ -40,9 +41,9 @@ from loguru import logger
 class GGMolVis(GGMolvisArtist):
     """Top level class that contains all the elements of the visualization.
     It is similar to a `Figure` in matplotlib. It contains all the
-    `Molecule`, `Shape`, `Text`, `Light`, and `World` objects.
+    `Trajectory`, `Shape`, `Text`, `Light`, and `World` objects.
     It also contains the global settings for the visualization like
-    `subframes`. It is a singleton class, so only one instance will be
+    `subframes`, `average`. It is a singleton class, so only one instance will be
     created in a session.
 
     During initialization, it creates a camera and a global world for
@@ -55,8 +56,8 @@ class GGMolVis(GGMolvisArtist):
 
     Properties:
     -----------
-    molecules: list
-        List of all `Molecule` objects in the visualization
+    trajectories: list
+        List of all `Trajectory` objects in the visualization
     shapes: list
         List of all `Shape` objects in the visualization
     texts: list
@@ -98,7 +99,7 @@ class GGMolVis(GGMolvisArtist):
         super().__init__()
         self.session.ggmolvis = self
         self._artists_dict = {
-            'molecules': [],
+            'trajectories': [],
             'shapes': [],
             'texts': [],
             'lights': [],
@@ -131,8 +132,8 @@ class GGMolVis(GGMolvisArtist):
         return [item for sublist in self._artists_dict.values() for item in sublist]
 
     @property
-    def molecules(self):
-        return self._artists_dict['molecules']
+    def trajectories(self):
+        return self._artists_dict['trajectories']
     
     @property
     def shapes(self):
@@ -165,8 +166,8 @@ class GGMolVis(GGMolvisArtist):
     @subframes.setter
     def subframes(self, value):
         self._subframes = value
-        for molecule in self.molecules:
-            molecule.trajectory.subframes = value
+        for trajectory in self.trajectories:
+            trajectory.trajectory.subframes = value
 
     @property
     def average(self):
@@ -175,8 +176,8 @@ class GGMolVis(GGMolvisArtist):
     @average.setter
     def average(self, value):
         self._average = value
-        for molecule in self.molecules:
-            molecule.trajectory.average = value
+        for trajectory in self.trajectories:
+            trajectory.trajectory.average = value
 
     def _set_scene(self):
         """Set up the scene with transparent background and CYCLES rendering."""
@@ -242,7 +243,7 @@ class GGMolVis(GGMolvisArtist):
             bpy.context.scene.frame_step = old_step
     
     @validate_properties
-    def molecule(self,
+    def trajectory(self,
                  universe: Union[AtomGroup, mda.Universe],
                  style: str = 'spheres',
                  name: str = 'atoms',
@@ -252,33 +253,34 @@ class GGMolVis(GGMolvisArtist):
                  color='default',
                  material='default',
                  ):
-        """Create a `Molecule` object and add it to the visualization.
+        """Create a `Trajectory` object and add it to the visualization.
         
         Parameters:
         -----------
         universe: MDAnalysis.AtomGroup or MDAnalysis.Universe
             The AtomGroup or Universe object containing the atoms
         style: str
-            The style of the molecule. Default is 'spheres'
+            The style of the trajectory. Default is 'spheres'
         name: str
-            The name of the molecule. Default is 'atoms'
+            The name of the trajectory. Default is 'atoms'
         location: np.ndarray or list
-            The location of the molecule. Default is None
+            The location of the trajectory. Default is None
         rotation: np.ndarray or list
-            The rotation of the molecule. Default is None
+            The rotation of the trajectory. Default is None
         scale: np.ndarray or list
-            The scale of the molecule. Default is None
+            The scale of the trajectory. Default is None
         color: str
-            The color of the molecule. Default is 'default'
+            The color of the trajectory. Default is 'default'
         material: str
-            The material of the molecule. Default is 'default'
+            The material of the trajectory. Default is 'default'
 
         Returns:
         --------
-        molecule: Molecule
-            The created `Molecule` object
+        trajectory: Trajectory
+            The created `Trajectory` object
         """
-        molecule = Molecule(atomgroup=universe,
+        trajectory = Trajectory(
+                            atomgroup=universe,
                             style=style,
                             name=name,
                             color=color,
@@ -287,8 +289,14 @@ class GGMolVis(GGMolvisArtist):
                             scale=scale,
                             material=material,
                             )
-        self.molecules.append(molecule)
-        return molecule
+        self.trajectories.append(trajectory)
+        return trajectory
+
+    @functools.wraps(trajectory)
+    def molecule(self, *args, **kwargs):
+        logger.warning("molecule() is deprecated. Use trajectory() instead.")
+        return self.trajectory(*args, **kwargs)
+
 
     @validate_properties
     def distance(self,
@@ -309,7 +317,7 @@ class GGMolVis(GGMolvisArtist):
         """
         if atom1.universe != atom2.universe:
             raise ValueError("The atoms belong to different universes")
-        mol_atoms = Molecule(atomgroup=AtomGroup(atom1 + atom2),
+        mol_atoms = Trajectory(atomgroup=AtomGroup(atom1 + atom2),
                             style=mol_style,
                             name=f'{name}_atoms',
                             color=mol_color,
@@ -334,7 +342,7 @@ class GGMolVis(GGMolvisArtist):
                     color=line_color,
                     material=line_material)
         self.shapes.append(line)
-        self.molecules.append(mol_atoms)
+        self.trajectories.append(mol_atoms)
         return mol_atoms, line
         
         

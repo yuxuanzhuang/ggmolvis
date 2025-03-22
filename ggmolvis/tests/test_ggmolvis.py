@@ -24,7 +24,7 @@ class TestGGMolVis(unittest.TestCase):
         self.assertIsInstance(vis.global_world, World)
 
         # Check if the artists dictionary is populated with default values
-        self.assertIn('molecules', vis._artists_dict)
+        self.assertIn('trajectories', vis._artists_dict)
         self.assertIn('shapes', vis._artists_dict)
         self.assertIn('texts', vis._artists_dict)
         self.assertIn('lights', vis._artists_dict)
