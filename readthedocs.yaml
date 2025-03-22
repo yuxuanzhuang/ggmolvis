@@ -12,7 +12,5 @@ sphinx:
 
 python:
   install:
-    - method: pip
-      path: .
-    - method: pip
-      requirements: docs/requirements.yaml
+    - path: .
+    - requirements: docs/requirements.yaml
