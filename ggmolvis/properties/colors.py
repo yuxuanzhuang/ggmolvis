@@ -8,6 +8,10 @@ from .base import Property
 class Color(Property):
     """Class for the color."""
 
+
+    def __init__(self, mol_obj, color):
+        self.colors = [color]
+
     # TODO: implement
     def _set_property(self):
         color_name = self.property_name

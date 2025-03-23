@@ -2,6 +2,12 @@ import bpy
 import molecularnodes as mn
 from molecularnodes.blender.nodes import swap, assign_material, add_custom
 
+
+color_dict = {"green": (0, 0.9, 0, 1.0),
+              "red": (1, 0, 0, 1.0),
+              "default": (0, 0, 0, 1.0),
+             }
+
 def extract_mn_node(object: bpy.types.Object):
     """Extract the node group from the MN object."""
     nodes_mn = object.modifiers["MolecularNodes"].node_group
@@ -53,6 +59,7 @@ def set_mn_color(object, color):
     # cannot remove link with
     if color_node.inputs["Color"].links:
         nodes_mn.links.remove(color_node.inputs["Color"].links[0])
+    color = color_dict[color]
     color_node.inputs['Color'].default_value = color
 
 def set_mn_material(object, material):
