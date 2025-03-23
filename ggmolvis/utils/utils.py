@@ -147,7 +147,11 @@ materials_mapping = {
     "ambient": "MN Ambient Occlusion",
     # backdrop for all other shapes
     "backdrop": "Backdrop",
+    # user-contributed add-in materials
+    "metal": "ggmolvis_metal",
+    "matte": "ggmolvis_matte",
 }
+
 
 AVAILABLE_MATERIALS = materials_mapping.keys()
 
