@@ -27,6 +27,7 @@ def _clean_up(ggmv):
                 ggmv._session.remove(artist.trajectory.uuid)
             except Exception:
                 pass
+    bpy.ops.wm.read_homefile(app_template="")
     ggmv._session.prune()
     ggmv._session._ggmolvis = set()
     ggmv._initialized = False
