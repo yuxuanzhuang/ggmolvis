@@ -83,10 +83,9 @@ def test_render_error_frame_range(ggmv, atomgroup, render_mp4):
 
 @cleanup
 @pytest.mark.xslow
-def test_render_basic_bg(tmpdir):
+def test_render_basic_bg(tmpdir, ggmv):
     # confirm correct propagation of background color
     # and image size specified
-    ggmv = GGMolVis()
     u = Universe(GRO)
     mol = ggmv.molecule(u.atoms)
     with tmpdir.as_cwd():
