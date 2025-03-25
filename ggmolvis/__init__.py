@@ -46,7 +46,7 @@ base_name = 'ggmolvis.blend'
 #count += 1
 
 # we will save the current session to the temporary directory
-dest_dir = f"{tempfile.gettempdir()}{uuid.uuid4()}"
+dest_dir = f"{tempfile.gettempdir()}/{uuid.uuid4()}"
 os.makedirs(dest_dir, exist_ok=True)
 dest_path = os.path.join(dest_dir, base_name)
 logger.debug(f"Blend file stored at {dest_path}")
