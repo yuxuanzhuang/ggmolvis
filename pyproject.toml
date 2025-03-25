@@ -23,7 +23,9 @@ dependencies = [
     "pydantic",
     "jupyter",
     "loguru",
-    "bpy"
+    "bpy",
+    "trimesh",
+    "pythreejs",
 ]
 keywords = [
     "molecular simulations",
