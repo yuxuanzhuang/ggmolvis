@@ -22,6 +22,16 @@ class RMSDVisualizer(Visualizer):
         return self
     
     @property
+    def _view_location(self):
+        """Get the view location for the camera"""
+        return self.mobile_mol._view_location
+    
+    @property
+    def _view_rotation(self):
+        """Get the view rotation for the camera"""
+        return self.mobile_mol._view_rotation
+    
+    @property
     def _camera_view_active(self):
         return self.mobile_mol._camera_view_active
     

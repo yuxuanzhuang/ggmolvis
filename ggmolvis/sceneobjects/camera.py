@@ -31,7 +31,7 @@ class Camera(SceneObject):
                  name='Camera',
                  location=None,
                  rotation=None,
-                 lens=24.0,
+                 lens=24,
                  clip_start=0.1,
                  clip_end=1000.0):
         super(SceneObject, self).__init__()
@@ -69,19 +69,16 @@ class Camera(SceneObject):
         getter=lambda self: self.camera.lens,
         setter=lambda self, value: setattr(self.camera, 'lens', value),
         doc="Camera lens",
-        allowed_type=float,
     )
     clip_start = DelegatedProperty().delegates(
         getter=lambda self: self.camera.clip_start,
         setter=lambda self, value: setattr(self.camera, 'clip_start', value),
         doc="Camera clip start",
-        allowed_type=float,
     )
     clip_end = DelegatedProperty().delegates(
         getter=lambda self: self.camera.clip_end,
         setter=lambda self, value: setattr(self.camera, 'clip_end', value),
         doc="Camera clip end",
-        allowed_type=float,
     )
 
     def _update_frame(self, frame_number):
@@ -99,17 +96,18 @@ class Camera(SceneObject):
                frame=None,
                filepath=None,
                resolution=None,
+               color_mode='RGBA',
                composite_bg_rgba=None):
         """Render the scene with this camera"""
         with ExitStack() as stack:
             stack.enter_context(
-                type(self.ggmolvis).lens.temporary_set_property(self.ggmolvis, lens) if lens is not None else nullcontext()
+                type(self).lens.temporary_set_property(self, lens) if lens is not None else nullcontext()
             )
             stack.enter_context(
-                type(self.ggmolvis).clip_start.temporary_set_property(self.ggmolvis, clip_start) if clip_start is not None else nullcontext()
+                type(self).clip_start.temporary_set_property(self, clip_start) if clip_start is not None else nullcontext()
             )
             stack.enter_context(
-                type(self.ggmolvis).clip_end.temporary_set_property(self.ggmolvis, clip_end) if clip_end is not None else nullcontext()
+                type(self).clip_end.temporary_set_property(self, clip_end) if clip_end is not None else nullcontext()
             )
             stack.enter_context(
                 type(self.ggmolvis).ggmolvis.frame.temporary_set_property(self.ggmolvis, frame)
@@ -118,6 +116,10 @@ class Camera(SceneObject):
             stack.enter_context(
                 type(self.ggmolvis).resolution.temporary_set_property(self.ggmolvis, resolution)
                 if resolution is not None else nullcontext()
+            )
+            stack.enter_context(
+                type(self.ggmolvis).color_mode.temporary_set_property(self.ggmolvis, color_mode)
+                if color_mode is not None else nullcontext()
             )
            
             bpy.context.scene.camera = self.object

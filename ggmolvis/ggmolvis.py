@@ -145,6 +145,7 @@ class GGMolVis(GGMolvisArtist):
             self.cycles_device = "GPU"
         except:
             pass
+        self.color_mode = 'RGBA'
         self.ffmpeg_codec = 'H264'
         self.ffmpeg_constant_rate_factor = 'HIGH'
         self.ffmpeg_format = 'MPEG4'
@@ -153,8 +154,10 @@ class GGMolVis(GGMolvisArtist):
         logger.debug(f"Transparent background: {self.transparent_background}")
         logger.debug(f"Cycles device set to: {self.cycles_device}")
         logger.debug(f"FFmpeg format: {self.ffmpeg_format}")
+        logger.debug(f"Color mode: {self.color_mode}")
         logger.debug(f"FFmpeg codec: {self.ffmpeg_codec}")
         logger.debug(f"FFmpeg constant rate factor: {self.ffmpeg_constant_rate_factor}")
+        logger.debug(f"Resolution: {self.resolution}")
 
     # Rendering properties
     render_engine = DelegatedProperty().delegates(
@@ -237,6 +240,13 @@ class GGMolVis(GGMolvisArtist):
         setter=lambda self, value: setattr(bpy.context.scene.render.image_settings, 'file_format', value),
         default='PNG',
         doc="The file format for the rendered image.",
+        allowed_type=str
+    )
+    color_mode = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.render.image_settings.color_mode,
+        setter=lambda self, value: setattr(bpy.context.scene.render.image_settings, 'color_mode', value),
+        default='RGBA',
+        doc="The color mode for the rendered image.",
         allowed_type=str
     )
     ffmpeg_format = DelegatedProperty().delegates(

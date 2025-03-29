@@ -3,6 +3,7 @@ ggmolvis
 Molecular visualization with Blender
 """
 
+import sys
 import os
 import shutil
 import tempfile
@@ -15,6 +16,11 @@ from ggmolvis.utils import suppress_blender_output
 import atexit
 
 from loguru import logger
+logger.remove()
+logger.add(
+    sink=sys.stderr,
+    level="INFO",
+    format="<level>{level}</level> | <level>{message}</level>")
 
 __version__ = version("ggmolvis")
 
