@@ -16,6 +16,7 @@ from typing import Union
 from .base import SceneObject
 from ..utils.node import set_selection
 from ..properties import TrajectoryColor, TrajectoryMaterial, TrajectoryStyle
+from ..delegated_property import DelegatedProperty
 
 
 class Trajectory(SceneObject):
@@ -110,9 +111,12 @@ class Trajectory(SceneObject):
         else:
             self._trajectory = self._session.trajectories.get(state['trajectory_uuid'])
 
-    @property
-    def object(self):
-        return self._trajectory.object
+
+    object = DelegatedProperty().delegates(
+        getter=lambda self: self._trajectory.object,
+        setter=None,
+        doc="The Blender object of the trajectory in the scene."
+    )
 
     @property
     def universe(self):
@@ -134,3 +138,16 @@ class Trajectory(SceneObject):
     def frame(self):
         return self.universe.trajectory.frame
     
+    subframes = DelegatedProperty().delegates(
+        getter=lambda self: self.trajectory.subframes,
+        setter=lambda self, value: setattr(self.trajectory, 'subframes', value),
+        default=0,
+        doc="Number of subframes to render. Default is 0."
+    )
+
+    average = DelegatedProperty().delegates(
+        getter=lambda self: self.trajectory.average,
+        setter=lambda self, value: setattr(self.trajectory, 'average', value),
+        default=0,
+        doc="Number of flanking frames to average over. Default is 0."
+    )

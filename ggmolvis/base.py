@@ -15,6 +15,7 @@ import numpy as np
 from typing import Union
 
 from . import SESSION
+from .delegated_property import DelegatedProperty
 
 class GGMolvisArtist(ABC):
     """Abstract class for all visualizations in GGMolVis.
@@ -30,11 +31,6 @@ class GGMolvisArtist(ABC):
         The scale of the object in the world. It is different
         from the scale in Blender as it is directly applied to
         the coordinates of the object. Default is 0.01
-    visible: bool
-        Visibility of the object. Default is True
-    z_order: int
-        Z-order of the object. The object with higher z-order
-        will be rendered on top of the object with lower z-order. Default is 0
     session: MNSession
         The linked `MNSession` object in molecularnodes package
     ggmolvis: set
@@ -55,8 +51,6 @@ class GGMolvisArtist(ABC):
 
         # default world_scale value used in Molecular Node
         self._world_scale = 0.01
-        self._visible = True
-        self._z_order = 0
         self._name = self.__class__.__name__
 
         #
@@ -86,33 +80,9 @@ class GGMolvisArtist(ABC):
         self._world_scale = value
     
     @property
-    def visible(self):
-        return self._visible
-
-    @visible.setter
-    def visible(self, value):
-        self._visible = value
-
-    @property
-    def z_order(self):
-        return self._z_order
-
-    @z_order.setter
-    def z_order(self, value):
-        self._z_order = value
-
-    @property
     def session(self):
         return self._session    
     
-    def set_visible(self):
-        """Set the object to be visible"""
-        self._visible = True
-
-    def set_invisible(self):
-        """Set the object to be invisible"""
-        self._visible = False
-
     @abstractmethod
     def _update_frame(self, frame):
         """Abstract method to update the object's state for the given frame"""
@@ -121,22 +91,6 @@ class GGMolvisArtist(ABC):
     @property
     def ggmolvis(self):
         return self.session.ggmolvis
-
-    @property
-    def subframes(self):
-        return self.ggmolvis.subframes
-
-    @subframes.setter
-    def subframes(self, value):
-        self.ggmolvis.subframes = value
-
-    @property
-    def average(self):
-        return self.ggmolvis.average
-
-    @average.setter
-    def average(self, value):
-        self.ggmolvis.average = value
 
     def _remove(self):
         """Remove the object from the session"""

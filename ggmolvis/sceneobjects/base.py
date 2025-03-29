@@ -19,6 +19,7 @@ from ..world import World
 from ..camera import Camera
 from ..properties import Color, Material, Style
 from ..utils import look_at
+from ..delegated_property import DelegatedProperty
 
 from loguru import logger
 
@@ -132,11 +133,14 @@ class SceneObject(GGMolvisArtist):
         self.style._apply_to(self.object)
         self.color._apply_to(self.object)
         self.material._apply_to(self.object)
-
-    @property
-    def object(self):
-        return bpy.data.objects[self.name]
     
+    object = DelegatedProperty().delegates(
+        getter=lambda self: bpy.data.objects[self.name],
+        # no setter here, as we don't want to set the object directly
+        setter=None,
+        doc="The Blender object in the scene.",
+    )
+
     @property
     def name(self):
         return self._name

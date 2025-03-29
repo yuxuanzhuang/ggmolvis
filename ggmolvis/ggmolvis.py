@@ -34,6 +34,7 @@ from .light import Light
 from .properties import Color, Material
 from .sceneobjects import SceneObject, Text, Trajectory, Shape, Line
 from .utils import validate_properties
+from .delegated_property import DelegatedProperty
 
 from loguru import logger
 
@@ -108,9 +109,6 @@ class GGMolVis(GGMolvisArtist):
         self._global_world = self.worlds[0]
         self._camera = Camera()
 
-        self._subframes = 0
-        self._average = 0
-
         # pre-defined camera position
         self._camera.world.location._set_coordinates((0, -4, 1.3))
         self._camera.world.rotation._set_coordinates((83, 0, 0))
@@ -164,26 +162,6 @@ class GGMolVis(GGMolvisArtist):
             self._camera.world.location._set_coordinates((0, -4, 1.3))
             self._camera.world.rotation._set_coordinates((83, 0, 0))
         return self._camera
-    
-    @property
-    def subframes(self):
-        return self._subframes
-    
-    @subframes.setter
-    def subframes(self, value):
-        self._subframes = value
-        for trajectory in self.trajectories:
-            trajectory.trajectory.subframes = value
-
-    @property
-    def average(self):
-        return self._average
-
-    @average.setter
-    def average(self, value):
-        self._average = value
-        for trajectory in self.trajectories:
-            trajectory.trajectory.average = value
 
     def _set_scene(self):
         """Set up the scene with transparent background and CYCLES rendering."""
@@ -194,6 +172,68 @@ class GGMolVis(GGMolvisArtist):
         except:
             pass
     
+    resolution = DelegatedProperty().delegates(
+        getter=lambda self: (bpy.context.scene.render.resolution_x,
+                             bpy.context.scene.render.resolution_y),
+        setter=lambda self, value: (
+            setattr(bpy.context.scene.render, 'resolution_x', value[0]),
+            setattr(bpy.context.scene.render, 'resolution_y', value[1])
+        ),
+        default=(1920, 1080),
+        doc="Resolution of the scene in pixels (Width, Height)."
+    )
+    resolution_scale = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.render.resolution_percentage,
+        setter=lambda self, value: setattr(bpy.context.scene.render, 'resolution_percentage', value),
+        default=100,
+        doc="Resolution scale of the scene in percentage."
+    )
+    frame_start = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.frame_start,
+        setter=lambda self, value: setattr(bpy.context.scene, 'frame_start', value),
+        default=0,
+        doc="The first frame of the scene. This is the frame that will be rendered for a movie."
+    )
+    frame_end = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.frame_end,
+        setter=lambda self, value: setattr(bpy.context.scene, 'frame_end', value),
+        default=0,
+        doc="The last frame of the scene. This is the frame that will be rendered for a movie."
+    )
+    frame_step = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.frame_step,
+        setter=lambda self, value: setattr(bpy.context.scene, 'frame_step', value),
+        default=1,
+        doc="The number of frames to skip between renders. "
+            "For example, if frame_step is set to 2, every second frame will be rendered."
+    )
+    frame_current = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.frame_current,
+        setter=lambda self, value: setattr(bpy.context.scene, 'frame_current', value),
+        default=0,
+        doc="The current frame of the scene. This is the frame that will be rendered for an image."
+    )
+    subframes = DelegatedProperty().delegates(
+        getter=lambda self: self.trajectories[0].trajectory.subframes if self.trajectories else 0,
+        setter=lambda self, value: (
+            setattr(self, '_subframes', value),
+            [setattr(trajectory.trajectory, 'subframes', value) for trajectory in self.trajectories]
+        ),
+        default=0,
+        doc="The number of subframes that will be inserted between frames of a trajectory "
+            "to smooth the motion. The first trajectory in the list will be used to get the value."
+    )
+    average = DelegatedProperty().delegates(
+        getter=lambda self: self.trajectories[0].trajectory.average if self.trajectories else 0,
+        setter=lambda self, value: (
+            setattr(self, '_average', value),
+            [setattr(trajectory.trajectory, 'average', value) for trajectory in self.trajectories]
+        ),
+        default=0,
+        doc="Number of flanking frames to average over "
+            "The first trajectory in the list will be used to get the value."
+    )
+
     def render(self,
                object: SceneObject = None,
                track: bool = False,
