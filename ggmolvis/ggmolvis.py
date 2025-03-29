@@ -194,7 +194,7 @@ class GGMolVis(GGMolvisArtist):
         ),
         default=(1920, 1080),
         doc="Resolution of the scene in pixels (Width, Height).",
-        allowed_type=[tuple, list],
+        allowed_type=(tuple, list),
     )
     resolution_scale = DelegatedProperty().delegates(
         getter=lambda self: bpy.context.scene.render.resolution_percentage,
