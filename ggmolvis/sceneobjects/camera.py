@@ -86,7 +86,6 @@ class Camera(SceneObject):
 
     def _update_frame(self, frame_number):
         """Update the camera's state for the given frame"""
-        # self.world._apply_to(self.object, frame_number)
         for property_name, dynamic_property in self._dynamic_properties.items():
             if isinstance(dynamic_property, DynamicProperty):
                 dynamic_property._update_frame(frame_number)

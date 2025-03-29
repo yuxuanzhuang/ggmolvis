@@ -19,12 +19,9 @@
 
    analysis
    base
-   camera
    data
    ggmolvis
-   light
    properties
    renderer
    sceneobjects
    utils
-   world

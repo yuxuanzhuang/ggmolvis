@@ -103,7 +103,6 @@ class Line(Shape):
             end_point[2],
             1.0,
         )
-        self.world._apply_to(object, frame)
 
     def _get_points_for_frame(self, frame: int) -> Tuple[float, float, float]:
         """Retrieve the coordinates for a specific frame"""
