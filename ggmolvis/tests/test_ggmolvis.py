@@ -1,19 +1,16 @@
 import pickle
 from ggmolvis import GGMolVis
-from ggmolvis.world import World
-from ggmolvis.camera import Camera
+from ggmolvis.sceneobjects.camera import Camera
 
 def test_initialization(ggmv):
-    # Check if the camera and world are set up correctly
     assert isinstance(ggmv.camera, Camera)
-    assert isinstance(ggmv.global_world, World)
 
     # Check if the artists dictionary is populated with default values
-    for key in ['trajectories', 'shapes', 'texts', 'lights', 'worlds']:
+    for key in ['trajectories', 'shapes', 'texts', 'lights']:
         assert key in ggmv._artists_dict
 
     # Check if the scene is set up correctly
-    assert ggmv._subframes == 0
+    assert ggmv.subframes == 0
 
 def test_singleton_pattern(ggmv):
     # Create second instance

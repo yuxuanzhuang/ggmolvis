@@ -17,8 +17,6 @@ import numpy as np
 from typing import Tuple, List, Union
 
 from .base import SceneObject
-from ..world import World
-from ..camera import Camera
 from ..properties import Color, Material
 from ..utils import convert_list_to_array, look_at, lerp
 

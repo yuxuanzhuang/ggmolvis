@@ -28,11 +28,15 @@ from pydantic import BaseModel, Field, validator, ValidationError
 from . import SESSION
 from .base import GGMolvisArtist
 
-from .world import World
-from .camera import Camera
-from .light import Light
 from .properties import Color, Material
-from .sceneobjects import SceneObject, Text, Trajectory, Shape, Line
+from .sceneobjects import (
+    Camera,
+    SceneObject,
+    Text,
+    Trajectory,
+    Shape,
+    Line
+)
 from .utils import validate_properties
 from .delegated_property import DelegatedProperty
 
@@ -42,15 +46,13 @@ from loguru import logger
 class GGMolVis(GGMolvisArtist):
     """Top level class that contains all the elements of the visualization.
     It is similar to a `Figure` in matplotlib. It contains all the
-    `Trajectory`, `Shape`, `Text`, `Light`, and `World` objects.
+    `Trajectory`, `Shape`, `Text`, and `Light` objects.
     It also contains the global settings for the visualization like
     `subframes`, `average`. It is a singleton class, so only one instance will be
     created in a session.
 
-    During initialization, it creates a camera and a global world for
-    object transformation. The camera is set to a default position
-    and rotation. The global world transformation is set to no positional,
-    rotational, or scaling transformation.
+    During initialization, it creates a camera. The camera is set to a default position
+    and rotation.
 
     The artists are stored in a dictionary with keys as the type of the
     artist and values as the list of artists of that type.
@@ -65,10 +67,6 @@ class GGMolVis(GGMolvisArtist):
         List of all `Text` objects in the visualization
     lights: list
         List of all `Light` objects in the visualization
-    worlds: list
-        List of all `World` transformation objects in the visualization
-    global_world: World
-        The global world transformation object
     camera: Camera
         The camera object
     """
@@ -95,14 +93,12 @@ class GGMolVis(GGMolvisArtist):
             'shapes': [],
             'texts': [],
             'lights': [],
-            'worlds': [World()]
         }
-        self._global_world = self.worlds[0]
-        self._camera = Camera()
 
         # pre-defined camera position
-        self._camera.world.location._set_coordinates((0, -4, 1.3))
-        self._camera.world.rotation._set_coordinates((83, 0, 0))
+        self._camera = Camera(location=(0, -4, 1.3),
+                              rotation=(83, 0, 0))
+
 
         # set up the scene
         self._set_scene()
@@ -113,8 +109,6 @@ class GGMolVis(GGMolvisArtist):
         """Update the camera's state for the given frame"""
         for artist in self._artists:
             artist._update_frame(frame_number)
-
-        self._camera.world._apply_to(self._camera.object, frame_number)
 
     @property
     def _artists(self):
@@ -137,21 +131,10 @@ class GGMolVis(GGMolvisArtist):
         return self._artists_dict['lights']
     
     @property
-    def worlds(self):
-        return self._artists_dict['worlds']
-
-    @property
-    def global_world(self):
-        if not hasattr(self, '_global_world'):
-            self._global_world = World()
-        return self._global_world
-    
-    @property
     def camera(self):
         if not hasattr(self, '_camera'):
-            self._camera = Camera()
-            self._camera.world.location._set_coordinates((0, -4, 1.3))
-            self._camera.world.rotation._set_coordinates((83, 0, 0))
+            self._camera = Camera(location=(0, -4, 1.3),
+                                    rotation=(83, 0, 0))
         return self._camera
 
     def _set_scene(self):
@@ -162,7 +145,17 @@ class GGMolVis(GGMolvisArtist):
             self.cycles_device = "GPU"
         except:
             pass
-    
+        self.ffmpeg_codec = 'H264'
+        self.ffmpeg_constant_rate_factor = 'HIGH'
+        self.ffmpeg_format = 'MPEG4'
+        logger.debug("Setting up the scene for rendering")
+        logger.debug(f"Render engine set to: {self.render_engine}")
+        logger.debug(f"Transparent background: {self.transparent_background}")
+        logger.debug(f"Cycles device set to: {self.cycles_device}")
+        logger.debug(f"FFmpeg format: {self.ffmpeg_format}")
+        logger.debug(f"FFmpeg codec: {self.ffmpeg_codec}")
+        logger.debug(f"FFmpeg constant rate factor: {self.ffmpeg_constant_rate_factor}")
+
     # Rendering properties
     render_engine = DelegatedProperty().delegates(
         getter=lambda self: bpy.context.scene.render.engine,
@@ -302,6 +295,7 @@ class GGMolVis(GGMolvisArtist):
                track: bool = False,
                frame: int = None,
                frame_range: tuple = None,
+               frame_rate: int = None,
                **kwargs):
         """
         Render the current scene.
@@ -335,14 +329,22 @@ class GGMolVis(GGMolvisArtist):
         kwargs['mode'] = render_mode
 
         if object is not None:
-            current_world = self.camera.world
+            old_location = self.camera.location.copy()
+            old_rotation = self.camera.rotation.copy()
             if track:
                 object._camera_view_active = True
             object._set_camera_view()
-            self.camera.world = object.camera_world
+            self.camera.location = object._view_location
+            self.camera.rotation = object._view_rotation
+
             self.camera.render(**kwargs)
             object._camera_view_active = False
-            self.camera.world = current_world
+            self.camera.location = old_location
+            self.camera.rotation = old_rotation
+        elif track:
+            logger.warning("track is set to True but no object is set. "
+                    "Rendering without tracking")
+            self.camera.render(**kwargs)
         else:
             self.camera.render(**kwargs)
         

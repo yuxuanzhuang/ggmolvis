@@ -5,8 +5,7 @@ import numpy as np
 from pydantic import BaseModel, Field, validator, ValidationError
 from typing import Tuple, List, Union
 
-from .base import GGMolvisArtist
-from . import SESSION
+from .base import SceneObject
 
-class Light(GGMolvisArtist):
+class Light(SceneObject):
     """Class for the light."""

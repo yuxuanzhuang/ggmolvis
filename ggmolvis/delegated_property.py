@@ -84,14 +84,19 @@ class DelegatedProperty:
         return self
     
     @contextmanager
-    def temporary_set_property(self, value):
+    def temporary_set_property(self, instance, value):
         """
-        Temporarily set an instance's property to a new value,
+        Temporarily set the owner's property to a new value,
         then restore the original value when the context is exited.
+
+        Parameters:
+        -----------
+        instance: The object that owns this property.
+            value: The temporary value to set.
         """
-        original_value = getattr(self, self.name)
-        setattr(self, self.name, value)
+        original_value = getattr(instance, self.name)
+        setattr(instance, self.name, value)
         try:
             yield
         finally:
-            setattr(self, self.name, original_value)
+            setattr(instance, self.name, original_value)
