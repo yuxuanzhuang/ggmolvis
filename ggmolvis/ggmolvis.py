@@ -71,15 +71,6 @@ class GGMolVis(GGMolvisArtist):
         The global world transformation object
     camera: Camera
         The camera object
-    subframes: int
-        Number of subframes to render. It will be a global setting
-        for all objects. Default is 0. For clarity, when subframes is set to `1`
-        the total frame count will double, and when it is set to `2` the
-        total frame count will triple.
-    average: int
-        Number of flanking frames to average over--this can help reduce
-        "jittering" in movies. In contrast to `subframes`, no new frames
-        are added. It will be a global setting for all objects. Default is 0.
     """
     def __new__(cls):
         if hasattr(SESSION, 'ggmolvis'):
@@ -116,7 +107,7 @@ class GGMolVis(GGMolvisArtist):
         # set up the scene
         self._set_scene()
 
-        self._update_frame(bpy.context.scene.frame_current)
+        self._update_frame(self.frame_current)
 
     def _update_frame(self, frame_number):
         """Update the camera's state for the given frame"""
@@ -165,13 +156,34 @@ class GGMolVis(GGMolvisArtist):
 
     def _set_scene(self):
         """Set up the scene with transparent background and CYCLES rendering."""
-        bpy.context.scene.render.engine = 'CYCLES'
-        bpy.context.scene.render.film_transparent = True
+        self.render_engine = 'CYCLES'
+        self.transparent_background = True
         try:
-            bpy.context.scene.cycles.device = "GPU"
+            self.cycles_device = "GPU"
         except:
             pass
     
+    render_engine = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.render.engine,
+        setter=lambda self, value: setattr(bpy.context.scene.render, 'engine', value),
+        default='CYCLES',
+        doc="Render engine to use for rendering.",
+        allowed_type=str
+    )
+    transparent_background = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.render.film_transparent,
+        setter=lambda self, value: setattr(bpy.context.scene.render, 'film_transparent', value),
+        default=True,
+        doc="Whether to use a transparent background for rendering.",
+        allowed_type=bool
+    )
+    cycles_device = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.cycles.device,
+        setter=lambda self, value: setattr(bpy.context.scene.cycles, 'device', value),
+        default='GPU',
+        doc="Render device to use for rendering.",
+        allowed_type=str
+    )
     resolution = DelegatedProperty().delegates(
         getter=lambda self: (bpy.context.scene.render.resolution_x,
                              bpy.context.scene.render.resolution_y),
@@ -180,38 +192,44 @@ class GGMolVis(GGMolvisArtist):
             setattr(bpy.context.scene.render, 'resolution_y', value[1])
         ),
         default=(1920, 1080),
-        doc="Resolution of the scene in pixels (Width, Height)."
+        doc="Resolution of the scene in pixels (Width, Height).",
+        allowed_type=[tuple, list],
     )
     resolution_scale = DelegatedProperty().delegates(
         getter=lambda self: bpy.context.scene.render.resolution_percentage,
         setter=lambda self, value: setattr(bpy.context.scene.render, 'resolution_percentage', value),
         default=100,
-        doc="Resolution scale of the scene in percentage."
+        doc="Resolution scale of the scene in percentage.",
+        allowed_type=int
     )
     frame_start = DelegatedProperty().delegates(
         getter=lambda self: bpy.context.scene.frame_start,
         setter=lambda self, value: setattr(bpy.context.scene, 'frame_start', value),
         default=0,
-        doc="The first frame of the scene. This is the frame that will be rendered for a movie."
+        doc="The first frame of the scene. This is the frame that will be rendered for a movie.",
+        allowed_type=int
     )
     frame_end = DelegatedProperty().delegates(
         getter=lambda self: bpy.context.scene.frame_end,
         setter=lambda self, value: setattr(bpy.context.scene, 'frame_end', value),
         default=0,
-        doc="The last frame of the scene. This is the frame that will be rendered for a movie."
+        doc="The last frame of the scene. This is the frame that will be rendered for a movie.",
+        allowed_type=int
     )
     frame_step = DelegatedProperty().delegates(
         getter=lambda self: bpy.context.scene.frame_step,
         setter=lambda self, value: setattr(bpy.context.scene, 'frame_step', value),
         default=1,
         doc="The number of frames to skip between renders. "
-            "For example, if frame_step is set to 2, every second frame will be rendered."
+            "For example, if frame_step is set to 2, every second frame will be rendered.",
+        allowed_type=int
     )
     frame_current = DelegatedProperty().delegates(
         getter=lambda self: bpy.context.scene.frame_current,
         setter=lambda self, value: setattr(bpy.context.scene, 'frame_current', value),
         default=0,
-        doc="The current frame of the scene. This is the frame that will be rendered for an image."
+        doc="The current frame of the scene. This is the frame that will be rendered for an image.",
+        allowed_type=int
     )
     subframes = DelegatedProperty().delegates(
         getter=lambda self: self.trajectories[0].trajectory.subframes if self.trajectories else 0,
@@ -220,8 +238,12 @@ class GGMolVis(GGMolvisArtist):
             [setattr(trajectory.trajectory, 'subframes', value) for trajectory in self.trajectories]
         ),
         default=0,
-        doc="The number of subframes that will be inserted between frames of a trajectory "
-            "to smooth the motion. The first trajectory in the list will be used to get the value."
+        doc="Number of subframes to render. It will be a global setting "
+            "for all objects. Default is 0. For clarity, when subframes is set to `1` "
+            "the total frame count will double, and when it is set to `2` the "
+            "total frame count will triple. "
+            "The first trajectory in the list will be used to get the value.",
+        allowed_type=int
     )
     average = DelegatedProperty().delegates(
         getter=lambda self: self.trajectories[0].trajectory.average if self.trajectories else 0,
@@ -230,8 +252,11 @@ class GGMolVis(GGMolvisArtist):
             [setattr(trajectory.trajectory, 'average', value) for trajectory in self.trajectories]
         ),
         default=0,
-        doc="Number of flanking frames to average over "
-            "The first trajectory in the list will be used to get the value."
+        doc="Number of flanking frames to average over--this can help reduce "
+            "jittering in movies. In contrast to `subframes`, no new frames "
+            "are added. It will be a global setting for all objects. Default is 0. "
+            "The first trajectory in the list will be used to get the value.",
+        allowed_type=int
     )
 
     def render(self,
@@ -251,7 +276,7 @@ class GGMolVis(GGMolvisArtist):
                 logger.warning("mode is set to 'movie' but frame is set. "
                         "Changing mode to 'image'")
             kwargs['mode'] = 'image'
-            bpy.context.scene.frame_set(frame)
+            self.frame_current = frame
         elif frame_range is not None:
             render_mode = 'movie'
             if kwargs.get('mode', None) == 'image':
@@ -261,12 +286,12 @@ class GGMolVis(GGMolvisArtist):
             if len(frame_range) != 3:
                 raise ValueError("frame_range must be a tuple of 3 integers (start, end, step)")
             start, end, step = frame_range
-            old_start = bpy.context.scene.frame_start
-            old_end = bpy.context.scene.frame_end
-            old_step = bpy.context.scene.frame_step
-            bpy.context.scene.frame_start = start
-            bpy.context.scene.frame_end = end
-            bpy.context.scene.frame_step = step
+            old_start = self.frame_start
+            old_end = self.frame_end
+            old_step = self.frame_step
+            self.frame_start = start
+            self.frame_end = end
+            self.frame_step = step
         else:
             render_mode = kwargs.pop('mode', 'image')
         kwargs['mode'] = render_mode
@@ -284,9 +309,9 @@ class GGMolVis(GGMolvisArtist):
             self.camera.render(**kwargs)
         
         if frame_range is not None:
-            bpy.context.scene.frame_start = old_start
-            bpy.context.scene.frame_end = old_end
-            bpy.context.scene.frame_step = old_step
+            self.frame_start = old_start
+            self.frame_end = old_end
+            self.frame_step = old_step
     
     @validate_properties
     def trajectory(self,

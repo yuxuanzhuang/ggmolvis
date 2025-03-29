@@ -35,15 +35,6 @@ class GGMolvisArtist(ABC):
         The linked `MNSession` object in molecularnodes package
     ggmolvis: set
         The set of all `GGMolvisArtist` objects in the session
-    subframes: int
-        Number of subframes to render. It will be a global setting
-        for all objects. Default is 0. For clarity, when subframes is set to `1`
-        the total frame count will double, and when it is set to `2` the
-        total frame count will triple.
-    average: int
-        Number of flanking frames to average over--this can help reduce
-        "jittering" in movies. In contrast to `subframes`, no new frames
-        are added. It will be a global setting for all objects. Default is 0.
     """
     def __init__(self):
         # only one MNSession will be used to keep everything in sync.

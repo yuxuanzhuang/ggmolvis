@@ -44,9 +44,6 @@ class SceneObject(GGMolvisArtist):
         super().__init__()
         self.name = name
 
-        self._subframes = 0
-        self._average = 0
-
         # Create the object
         obj = self._create_object()
 
@@ -139,6 +136,20 @@ class SceneObject(GGMolvisArtist):
         # no setter here, as we don't want to set the object directly
         setter=None,
         doc="The Blender object in the scene.",
+    )
+
+    visible = DelegatedProperty().delegates(
+        getter=lambda self: not self.object.hide_render,
+        setter=lambda self, value: setattr(self.object, "hide_render", not value),
+        doc="Visibility of the object during rendering.",
+        allowed_type=bool,
+    )
+
+    visible_in_viewport = DelegatedProperty().delegates(
+        getter=lambda self: not self.object.hide_viewport,
+        setter=lambda self, value: setattr(self.object, "hide_viewport", not value),
+        doc="Visibility of the object in the viewport.",
+        allowed_type=bool,
     )
 
     @property

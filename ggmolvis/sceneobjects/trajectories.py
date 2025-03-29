@@ -142,12 +142,19 @@ class Trajectory(SceneObject):
         getter=lambda self: self.trajectory.subframes,
         setter=lambda self, value: setattr(self.trajectory, 'subframes', value),
         default=0,
-        doc="Number of subframes to render. Default is 0."
+        doc="Number of subframes to render. It will be a global setting "
+            "for all objects. Default is 0. For clarity, when subframes is set to `1` "
+            "the total frame count will double, and when it is set to `2` the "
+            "total frame count will triple.",
+        allowed_type=int,
     )
 
     average = DelegatedProperty().delegates(
         getter=lambda self: self.trajectory.average,
         setter=lambda self, value: setattr(self.trajectory, 'average', value),
         default=0,
-        doc="Number of flanking frames to average over. Default is 0."
+        doc="Number of flanking frames to average over--this can help reduce "
+            "jittering in movies. In contrast to `subframes`, no new frames "
+            "are added. It will be a global setting for all objects. Default is 0. ",
+        allowed_type=int,
     )
