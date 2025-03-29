@@ -163,6 +163,7 @@ class GGMolVis(GGMolvisArtist):
         except:
             pass
     
+    # Rendering properties
     render_engine = DelegatedProperty().delegates(
         getter=lambda self: bpy.context.scene.render.engine,
         setter=lambda self, value: setattr(bpy.context.scene.render, 'engine', value),
@@ -231,6 +232,43 @@ class GGMolVis(GGMolvisArtist):
         doc="The current frame of the scene. This is the frame that will be rendered for an image.",
         allowed_type=int
     )
+    frame_rate = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.render.fps,
+        setter=lambda self, value: setattr(bpy.context.scene.render, 'fps', value),
+        default=24,
+        doc="The frame rate of the scene in frames per second.",
+        allowed_type=int
+    )
+    render_file_format = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.render.image_settings.file_format,
+        setter=lambda self, value: setattr(bpy.context.scene.render.image_settings, 'file_format', value),
+        default='PNG',
+        doc="The file format for the rendered image.",
+        allowed_type=str
+    )
+    ffmpeg_format = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.render.ffmpeg.format,
+        setter=lambda self, value: setattr(bpy.context.scene.render.ffmpeg, 'format', value),
+        default='MPEG4',
+        doc="The file format for the rendered movie.",
+        allowed_type=str
+    )
+    ffmpeg_codec = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.render.ffmpeg.codec,
+        setter=lambda self, value: setattr(bpy.context.scene.render.ffmpeg, 'codec', value),
+        default='H264',
+        doc="The codec for the rendered movie.",
+        allowed_type=str
+    )
+    ffmpeg_constant_rate_factor = DelegatedProperty().delegates(
+        getter=lambda self: bpy.context.scene.render.ffmpeg.constant_rate_factor,
+        setter=lambda self, value: setattr(bpy.context.scene.render.ffmpeg, 'constant_rate_factor', value),
+        default='HIGH',
+        doc="The constant rate factor for the rendered movie.",
+        allowed_type=str
+    )
+
+    # Trajectory properties
     subframes = DelegatedProperty().delegates(
         getter=lambda self: self.trajectories[0].trajectory.subframes if self.trajectories else 0,
         setter=lambda self, value: (

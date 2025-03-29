@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 class DelegatedProperty:
     def __init__(self):
         self.getter = None
@@ -81,24 +83,15 @@ class DelegatedProperty:
         self._doc = doc if doc is not None else f"Delegated property with default {default}.{allowed_info}"
         return self
     
-    def temporary_set(self, instance, value):
+    @contextmanager
+    def temporary_set_property(self, value):
         """
-        Temporarily set the property value for the given instance.
-
-        Parameters:
-        -----------
-        instance: object
-            The instance to set the property on.
-        value: any
-            The value to set.
-
-        Returns:
-        --------
-        None
+        Temporarily set an instance's property to a new value,
+        then restore the original value when the context is exited.
         """
-        if self.setter is None:
-            raise AttributeError(f"{type(instance).__name__} cannot set {self.name} (setter not defined)")
+        original_value = getattr(self, self.name)
+        setattr(self, self.name, value)
         try:
-            self.setter(instance, value)
-        except Exception as e:
-            raise AttributeError(f"{type(instance).__name__} cannot set {self.name}: {e}")
+            yield
+        finally:
+            setattr(self, self.name, original_value)

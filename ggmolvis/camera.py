@@ -20,6 +20,7 @@ from .world import World, Location, Rotation
 from . import SESSION
 from .renderer import Renderer, MovieRenderer
 from .compositor import _set_compositor_bg
+from .delegated_property import DelegatedProperty
 
 class Camera(GGMolvisArtist):
     """Class for the camera."""
@@ -46,48 +47,41 @@ class Camera(GGMolvisArtist):
         self.clip_start = self.clip_start
         self.clip_end = self.clip_end
 
-        self.set_view()
+        bpy.context.scene.camera = self.object
 
-    @property
-    def camera(self):
-        return bpy.data.cameras[self.name]
-    
-    @property
-    def lens(self):
-        return self.camera.lens
-    
-    @lens.setter
-    def lens(self, value):
-        self.camera.lens = value
-    
-    @property
-    def clip_start(self):
-        return self.camera.clip_start
-    
-    @clip_start.setter
-    def clip_start(self, value):
-        self.camera.clip_start = value
-
-    @property
-    def clip_end(self):
-        return self.camera.clip_end
-    
-    @clip_end.setter
-    def clip_end(self, value):
-        self.camera.clip_end = value
-
-    @property
-    def object(self):
-        return bpy.data.objects[self.name]
+    camera = DelegatedProperty().delegates(
+        getter=lambda self: bpy.data.cameras[self.name],
+        setter=None,
+        doc="Camera object",
+    )
+    lens = DelegatedProperty().delegates(
+        getter=lambda self: self.camera.lens,
+        setter=lambda self, value: setattr(self.camera, 'lens', value),
+        doc="Camera lens",
+        allowed_type=float,
+    )
+    clip_start = DelegatedProperty().delegates(
+        getter=lambda self: self.camera.clip_start,
+        setter=lambda self, value: setattr(self.camera, 'clip_start', value),
+        doc="Camera clip start",
+        allowed_type=float,
+    )
+    clip_end = DelegatedProperty().delegates(
+        getter=lambda self: self.camera.clip_end,
+        setter=lambda self, value: setattr(self.camera, 'clip_end', value),
+        doc="Camera clip end",
+        allowed_type=float,
+    )
+    object = DelegatedProperty().delegates(
+        getter=lambda self: bpy.data.objects[self.name],
+        setter=None,
+        doc="Camera object",
+    )
     
     def _update_frame(self, frame_number):
         """Update the camera's state for the given frame"""
         self.world._apply_to(self.object, frame_number)
     
-    def set_view(self):
-        """Set the current view to this camera"""
-        bpy.context.scene.camera = self.object
-
     def set_position(self, location, rotation):
         """Set the position of the camera"""
         self.world.location = location
@@ -100,7 +94,7 @@ class Camera(GGMolvisArtist):
                clip_end=None,
                frame=None,
                filepath=None,
-               resolution=(640, 360),
+               resolution=None,
                composite_bg_rgba=None):
         """Render the scene with this camera"""
         bpy.context.scene.camera = self.object
@@ -114,17 +108,19 @@ class Camera(GGMolvisArtist):
             old_clip_end = self.clip_end
             self.clip_end = clip_end
         if frame is not None:
-            bpy.context.scene.frame_set(frame)
+            old_frame = self.ggmolvis.frame
+            self.ggmolvis.frame_current = frame
+        if resolution is not None:
+            old_resolution = self.ggmolvis.resolution
+            self.ggmolvis.resolution = resolution
 
         if composite_bg_rgba is not None:
            _set_compositor_bg(composite_bg_rgba)
 
-        if mode == 'image':        
-            renderer = Renderer(resolution=resolution,
-                                filepath=filepath)
+        if mode == 'image':
+            renderer = Renderer(filepath=filepath)
         elif mode == 'movie':
-            renderer = MovieRenderer(resolution=resolution,
-                            filepath=filepath)
+            renderer = MovieRenderer(filepath=filepath)
         renderer.render()
         renderer.display_in_notebook()
 
@@ -134,3 +130,7 @@ class Camera(GGMolvisArtist):
             self.clip_start = old_clip_start
         if clip_end is not None:
             self.clip_end = old_clip_end
+        if frame is not None:
+            self.ggmolvis.frame = frame
+        if resolution is not None:
+            self.ggmolvis.resolution = resolution

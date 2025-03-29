@@ -144,7 +144,3 @@ class Line(Shape):
             locations = locations_a
 
         return locations
-
-    @property
-    def object(self):
-        return self.line_object
