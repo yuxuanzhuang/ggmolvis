@@ -33,25 +33,22 @@ mn_template_file = os.path.join(
         "assets", "template", "startup.blend"
     )
 base_name = 'ggmolvis.blend'
-#name, ext = os.path.splitext(base_name)
-#dest_path = os.path.join('.', base_name)
-#dest_dir = '.'
-#if not os.access(dest_dir, os.W_OK):
-#    print(f"Directory {dest_dir} is not writable. Using a temporary directory.")
-#dest_dir = tempfile.gettempdir()
-
-#count = 1
-#while os.path.exists(dest_path):
-#dest_path = os.path.join(dest_dir, f"{name}_{count}{ext}")
-#count += 1
 
 # we will save the current session to the temporary directory
-dest_dir = f"{tempfile.gettempdir()}/{uuid.uuid4()}"
-os.makedirs(dest_dir, exist_ok=True)
-dest_path = os.path.join(dest_dir, base_name)
-logger.debug(f"Blend file stored at {dest_path}")
+try:
+    dest_dir = f"{tempfile.gettempdir()}/{uuid.uuid4()}"
+    os.makedirs(dest_dir, exist_ok=True)
+    dest_path = os.path.join(dest_dir, base_name)
+    shutil.copy(mn_template_file, dest_path)
+except Exception as e:
+    # fallback to the current directory if tempdir fails
+    # create a unique filename in the current directory
+    base_name = f'{uuid.uuid4()}.blend'
+    dest_dir = '.'
+    dest_path = os.path.join(dest_dir, base_name)
+    shutil.copy(mn_template_file, dest_path)
 
-shutil.copy(mn_template_file, dest_path)
+logger.debug(f"Blend file is saved to: {dest_path}")
 
 with suppress_blender_output():
     bpy.ops.wm.open_mainfile(filepath=dest_path)

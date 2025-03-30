@@ -1,7 +1,27 @@
 import pickle
+import os
+from unittest.mock import patch
+import pytest
+import importlib
+
+import ggmolvis
 from ggmolvis import GGMolVis
 from ggmolvis.world import World
 from ggmolvis.camera import Camera
+
+@pytest.mark.skip(reason="Reload the module leads to cleanup issues")
+def test_create_blend_file():
+    with patch("os.makedirs") as mock_createdir, \
+        patch("uuid.uuid4") as mock_uuid:
+        mock_uuid.return_value = 'test-ggmolvis-uuid'
+
+        mock_createdir.side_effect = Exception("cannot access temp dir")
+        importlib.reload(ggmolvis)
+        # Test if the blend file was created successfully
+        assert os.path.exists('test-ggmolvis-uuid.blend')
+        # remove the created file for cleanup
+        os.remove('test-ggmolvis-uuid.blend')
+
 
 def test_initialization(ggmv):
     # Check if the camera and world are set up correctly
