@@ -2,3 +2,5 @@ from .base import SceneObject
 from .shapes import Shape, Line
 from .trajectories import Trajectory
 from .texts import Text
+from .camera import Camera
+from .light import Light

@@ -17,8 +17,6 @@ import numpy as np
 from typing import Tuple, List, Union
 
 from .base import SceneObject
-from ..world import World
-from ..camera import Camera
 from ..properties import Color, Material
 from ..utils import convert_list_to_array, look_at, lerp
 
@@ -105,15 +103,14 @@ class Line(Shape):
             end_point[2],
             1.0,
         )
-        self.world._apply_to(object, frame)
 
     def _get_points_for_frame(self, frame: int) -> Tuple[float, float, float]:
         """Retrieve the coordinates for a specific frame"""
 
-        if self.subframes == 0:
+        if self.ggmolvis.subframes == 0:
             frame_a = frame
         else:
-            frame_a = int(frame / (self.subframes + 1))
+            frame_a = int(frame / (self.ggmolvis.subframes + 1))
 
         # get the next frame
         frame_b = frame_a + 1
@@ -135,8 +132,8 @@ class Line(Shape):
             else:
                 raise ValueError("Invalid transformation coordinates")
 
-        if self.subframes > 0:
-            fraction = frame % (self.subframes + 1) / (self.subframes + 1)
+        if self.ggmolvis.subframes > 0:
+            fraction = frame % (self.ggmolvis.subframes + 1) / (self.ggmolvis.subframes + 1)
 
             # interpolate between the two sets of positions
             locations = lerp(locations_a, locations_b, t=fraction)
@@ -144,7 +141,3 @@ class Line(Shape):
             locations = locations_a
 
         return locations
-
-    @property
-    def object(self):
-        return self.line_object

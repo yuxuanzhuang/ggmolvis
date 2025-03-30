@@ -15,10 +15,10 @@ import numpy as np
 from typing import Tuple, List, Union
 
 from ..base import GGMolvisArtist
-from ..world import World
-from ..camera import Camera
 from ..properties import Color, Material, Style
 from ..utils import look_at
+from ..delegated_property import DelegatedProperty
+from ..properties.dynamic_property import DynamicProperty
 
 from loguru import logger
 
@@ -39,26 +39,24 @@ class SceneObject(GGMolvisArtist):
         material="backdrop",
         style="default",
     ):
-        self.world = World(location=location, rotation=rotation, scale=scale)
         super().__init__()
+
         self.name = name
-
-        self._subframes = 0
-        self._average = 0
-
         # Create the object
         obj = self._create_object()
-
         # set the name that Blender assigned to the object
         self.name = obj.name
+
+        self._dynamic_properties = {}
+
+        self.location = location
+        self.rotation = rotation
+        self.scale = scale
 
         self._init_color(color)
         self._init_material(material)
         self._init_style(style)
 
-        self.world._apply_to(self.object)
-
-        self.camera_world = World()
         self._set_camera_view()
         self._camera_view_active = False
 
@@ -102,14 +100,21 @@ class SceneObject(GGMolvisArtist):
 
         camera_degree = np.rad2deg(list(rot.to_euler()))
 
-        self.camera_world.location.coordinates = camera_center
-        self.camera_world.rotation.coordinates = camera_degree
+        self._view_location = camera_center
+        self._view_rotation = camera_degree
 
     def _update_frame(self, frame):
         object = self.object
         self.material._apply_to(object, frame)
         self.color._apply_to(object, frame)
-        self.world._apply_to(object, frame)
+        for prop_name, dynamic_prop in self._dynamic_properties.items():
+            """Update dynamic properties for the object"""
+            # Update the dynamic properties
+            dynamic_prop._update_frame(frame)
+            # Apply the updated value to the object
+            # This is done in the setter of the property
+            setattr(object, prop_name, dynamic_prop.value)
+
         if self._camera_view_active:
             self._set_camera_view()
 
@@ -132,11 +137,90 @@ class SceneObject(GGMolvisArtist):
         self.style._apply_to(self.object)
         self.color._apply_to(self.object)
         self.material._apply_to(self.object)
-
-    @property
-    def object(self):
-        return bpy.data.objects[self.name]
     
+    object = DelegatedProperty().delegates(
+        getter=lambda self: bpy.data.objects[self.name],
+        # no setter here, as we don't want to set the object directly
+        setter=None,
+        doc="The Blender object in the scene.",
+    )
+
+    visible = DelegatedProperty().delegates(
+        getter=lambda self: not self.object.hide_render,
+        setter=lambda self, value: setattr(self.object, "hide_render", not value),
+        doc="Visibility of the object during rendering.",
+        allowed_type=bool,
+    )
+
+    visible_in_viewport = DelegatedProperty().delegates(
+        getter=lambda self: not self.object.hide_viewport,
+        setter=lambda self, value: setattr(self.object, "hide_viewport", not value),
+        doc="Visibility of the object in the viewport.",
+        allowed_type=bool,
+    )
+
+    location = DelegatedProperty().delegates(
+        getter=lambda self: self.object.location,
+        setter=lambda self, value: self._set_transformation('location', value),
+        doc="Camera location",
+    )
+    rotation = DelegatedProperty().delegates(
+        getter=lambda self: np.rad2deg(self.object.rotation_euler),
+        setter=lambda self, value: self._set_transformation('rotation', value),
+        doc="Camera rotation",
+    )
+    scale = DelegatedProperty().delegates(
+        getter=lambda self: self.object.scale,
+        setter=lambda self, value: self._set_transformation('scale', value),
+        doc="Scale of the object",
+        # Allowing for a tuple/list of 3 floats for scale
+    )
+
+    def _set_transformation(
+            self,
+            property_name: str,
+            value: Union[List[float], Tuple[float, ...], np.ndarray]):
+        """
+        Set a transformation property of the object (e.g. location, rotation, scale).
+
+        Parameters
+        ----------
+        property_name : str
+            The name of the property to set (e.g. 'location', 'rotation_euler', 'scale').
+        value : Union[List[float], Tuple[float, ...], np.ndarray]
+            The value to assign. This can be a 1D sequence of 3 floats (a single coordinate)
+            or a 2D array-like with shape (N, 3) (multiple coordinates).
+
+        Note, if property_name is 'scale', a 1-element sequence is expanded to a 3D vector.
+        """
+        if value is None:
+            return
+        self._dynamic_properties[property_name] = None  # Clear any existing dynamic property for this name
+        value = np.asarray(value)
+
+        # Convert degrees to radians for rotation_euler.
+        if property_name == 'rotation':
+            value = np.deg2rad(value)
+            property_name = 'rotation_euler'  # Blender uses 'rotation_euler' for rotation
+
+        if value.ndim == 1:
+            # Handle the 'scale' special case:
+            if property_name == 'scale':
+                if value.size == 1:
+                    value = np.array([value[0]] * 3)
+                elif value.size != 3:
+                    raise ValueError("Scale must be a 3D vector (either a single value or 3 values).")
+            else:
+                if value.size != 3:
+                    raise ValueError("Coordinates must be a 3D vector (3 elements).")
+            setattr(self.object, property_name, value)
+        elif value.ndim == 2:
+            if value.shape[1] != 3:
+                raise ValueError("Each coordinate must be 3D (the array must have 3 columns).")
+            self._dynamic_properties[property_name] = DynamicProperty(input_list=value)
+        else:
+            raise ValueError("Coordinates must be either a 1D vector of size 3 or a 2D array with 3 columns.")
+
     @property
     def name(self):
         return self._name

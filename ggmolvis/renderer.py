@@ -21,15 +21,12 @@ import bpy
 import tempfile
 from PIL import Image
 from IPython.display import display, Video
+from loguru import logger
 
 class Renderer:
-    def __init__(self, resolution=(1280, 720), filepath=None):
-        # Set the render resolution
-        bpy.context.scene.render.resolution_x = resolution[0]
-        bpy.context.scene.render.resolution_y = resolution[1]
+    def __init__(self, filepath=None):
         bpy.context.scene.render.filepath = filepath or tempfile.NamedTemporaryFile(suffix=".PNG").name
-        print('Rendering to:', bpy.context.scene.render.filepath)
-        bpy.context.scene.render.image_settings.file_format = 'PNG'
+        logger.info(f'Rendering to: {bpy.context.scene.render.filepath}')
     
     def render(self):
         # Render the scene
@@ -44,15 +41,9 @@ class Renderer:
 
 
 class MovieRenderer(Renderer):
-    def __init__(self, resolution=(640, 360), filepath=None):
-        bpy.context.scene.render.resolution_x = resolution[0]
-        bpy.context.scene.render.resolution_y = resolution[1]
+    def __init__(self, filepath=None):
         bpy.context.scene.render.filepath = filepath or tempfile.NamedTemporaryFile(suffix=".mp4").name
-        print('Rendering to:', bpy.context.scene.render.filepath)
-        bpy.context.scene.render.image_settings.file_format = 'FFMPEG'
-        bpy.context.scene.render.ffmpeg.format = 'MPEG4'
-        bpy.context.scene.render.ffmpeg.codec = 'H264'
-        bpy.context.scene.render.ffmpeg.constant_rate_factor = 'HIGH'
+        logger.info(f'Rendering to: {bpy.context.scene.render.filepath}')
     
     def render(self):
         # Render the movie
