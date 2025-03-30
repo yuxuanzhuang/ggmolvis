@@ -6,6 +6,7 @@ Molecular visualization with Blender
 import os
 import shutil
 import tempfile
+import uuid
 from importlib.metadata import version
 import bpy
 from bpy.app.handlers import frame_change_pre
@@ -45,7 +46,8 @@ base_name = 'ggmolvis.blend'
 #count += 1
 
 # we will save the current session to the temporary directory
-dest_dir = tempfile.gettempdir()
+dest_dir = f"{tempfile.gettempdir()}/{uuid.uuid4()}"
+os.makedirs(dest_dir, exist_ok=True)
 dest_path = os.path.join(dest_dir, base_name)
 logger.debug(f"Blend file stored at {dest_path}")
 
