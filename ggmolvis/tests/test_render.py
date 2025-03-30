@@ -87,7 +87,7 @@ def test_render_basic_bg(tmpdir, ggmv):
     # confirm correct propagation of background color
     # and image size specified
     u = Universe(GRO)
-    mol = ggmv.molecule(u.atoms)
+    mol = ggmv.trajectory(u.atoms)
     with tmpdir.as_cwd():
         ggmv.render(object=mol,
                     resolution=(50, 50),
