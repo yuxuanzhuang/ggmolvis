@@ -14,6 +14,7 @@ Classes
     :members:
 """
 import bpy
+import tempfile
 from abc import ABC, abstractmethod
 import functools
 import molecularnodes as mn
@@ -405,3 +406,99 @@ class GGMolVis(GGMolvisArtist):
         if value not in bpy.data.materials:
             raise ValueError(f"Material {value} not found in the Blender data")
         return value
+
+
+    def adjust_camera(self):
+        """Adjust the camera in jupyter notebook"""
+        # render the scene to gltf
+        temp_file = tempfile.NamedTemporaryFile(suffix='.glb')
+        bpy.ops.export_scene.gltf(
+                                filepath=temp_file.name,
+                                export_hierarchy_full_collections=True,
+                                export_apply=True,
+                                export_gn_mesh=True,
+                                export_cameras=True,
+                                export_yup=False,
+        )
+        import trimesh
+        import numpy as np
+        from pythreejs import (BufferGeometry, BufferAttribute,
+                               Mesh, MeshStandardMaterial,
+                               PerspectiveCamera, Scene,
+                               AmbientLight, OrbitControls,
+                               Renderer
+        )
+        from IPython.display import display
+        import ipywidgets as widgets
+        import trimesh
+        from scipy.spatial.transform import Rotation as R
+
+        mesh = trimesh.load(temp_file.name)
+        mol_lists = list(mesh.geometry.keys())
+
+        # remove 'backdrop' background
+        mol_lists = [mol for mol in mol_lists if mol != 'Backdrop']
+
+        if len(mol_lists) == 0:
+            raise ValueError("No molecules found in the scene; "
+                             "First add a molecule to the scene; "
+                             "Also vdw representation is not supported")
+        atom_selector = widgets.SelectMultiple(
+            options=mol_lists,
+            value=mol_lists,
+            description='Molecules',
+            rows=10
+        )
+
+        def create_rep(mesh, mol):
+            vertices_all = mesh.geometry[mol].vertices.astype(np.float32)
+            faces = mesh.geometry[mol].faces.astype(np.uint32)
+            
+            geometry = BufferGeometry(
+                attributes={
+                    'position': BufferAttribute(vertices_all),
+                    'index': BufferAttribute(faces.ravel())
+                }
+            )
+
+            material = MeshStandardMaterial(color='#ff0000',
+                                            metalness=0.5, roughness=0.5)
+            rep = Mesh(geometry, material)
+            return rep
+
+        # Initial geometry
+        reps = [create_rep(mesh, mol) for mol in atom_selector.value]
+
+        # Camera setup
+        cam = mesh.camera
+        cam_transform = mesh.camera_transform
+        position = cam_transform[:3, 3]
+        forward = cam_transform[:3, 2]
+        target = position - forward
+        vertical_fov = float(cam.fov[1])
+        camera = PerspectiveCamera(position=position.tolist(), fov=vertical_fov)
+        camera.lookAt(target.tolist())
+
+        controller = OrbitControls(controlling=camera)
+        light = AmbientLight(intensity=0.5)
+
+        scene = Scene(children=reps + [camera, light], background='gray')
+        renderer = Renderer(scene=scene, camera=camera, controls=[controller], width=960, height=540)
+
+        def on_rep_select(change):
+            new_reps = [create_rep(mesh, value) for value in change['new']]
+            
+            scene.children = [camera, light] + new_reps
+        atom_selector.observe(on_rep_select, names='value')
+
+        camera_button = widgets.Button(description="Save Camera Position")
+        def print_camera_info(b):
+            quat = camera.quaternion  # [x, y, z, w]
+            rot = R.from_quat([quat[0], quat[1], quat[2], quat[3]])
+            euler = rot.as_euler('xyz', degrees=True)
+
+            self.camera.world.location = camera.position
+            self.camera.world.rotation = euler.tolist()
+        camera_button.on_click(print_camera_info)
+        ui = widgets.VBox([atom_selector, camera_button, renderer])
+        display(ui)
