@@ -4,6 +4,12 @@ from typing import Union
 from ..utils.node import set_mn_material
 from .base import Property
 from ..utils import materials_mapping, AVAILABLE_MATERIALS
+from ggmolvis import material_contrib
+
+
+# make approved user-contributed add-in materials available
+material_contrib.metal.material_generator()
+material_contrib.matte.material_generator()
 
 class Material(Property):
     """Class for the material."""
